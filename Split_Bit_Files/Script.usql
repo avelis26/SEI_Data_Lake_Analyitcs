@@ -1,1 +1,11 @@
-﻿
+﻿@key1 =
+    EXTRACT UserID		int,
+            Start		DateTime,
+            Region		string,
+            Query		string
+    FROM @"/BIT_CRM/FolderDate/File"
+    USING Extractors.Text();
+
+OUTPUT @key1
+	TO @"/BIT_CRM/BIT_Test/key1.csv"
+	USING Outputters.Csv();
