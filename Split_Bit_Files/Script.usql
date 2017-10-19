@@ -1,11 +1,15 @@
 ﻿@key1 =
-    EXTRACT UserID		int,
-            Start		DateTime,
-            Region		string,
-            Query		string
-    FROM @"/BIT_CRM/FolderDate/File"
-    USING Extractors.Text();
+	EXTRACT		UserID		int,
+				Start		DateTime,
+				Region		string,
+				Query		string
+FROM @"/BIT_CRM/20170202/ras.dltx.postrn.20161031.092721.00004010"
+USING Extractors.Text();
 
 OUTPUT @key1
-	TO @"/BIT_CRM/BIT_Test/key1.csv"
-	USING Outputters.Csv();
+TO @"/BIT_CRM/BIT_Test/key1.csv"
+USING Outputters.Csv();
+
+// https://docs.microsoft.com/en-us/azure/data-lake-analytics/data-lake-analytics-u-sql-get-started
+// https://saveenr.gitbooks.io/usql-tutorial/content/getting-started/preparing-for-the-tutorial.html
+// https://msdn.microsoft.com/en-us/library/azure/mt796463.aspx
