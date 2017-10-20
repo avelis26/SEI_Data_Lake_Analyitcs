@@ -1,13 +1,18 @@
-﻿@key1 =
+﻿DECLARE @input_file string = @"/BIT_CRM/20170202/ras.dltx.postrn.20161031.092721.00004010";
+DECLARE @bucket_1_file string = @"/BIT_CRM/20170202/bucket_1.csv";
+DECLARE @bucket_2_file string = @"/BIT_CRM/20170202/bucket_2.csv";
+DECLARE @bucket_3_file string = @"/BIT_CRM/20170202/bucket_3.csv";
+
+@key1 =
 	EXTRACT		UserID		int,
 				Start		DateTime,
 				Region		string,
 				Query		string
-FROM @"/BIT_CRM/20170202/ras.dltx.postrn.20161031.092721.00004010"
-USING Extractors.Text();
+FROM @input_file
+USING new USQL_Programmability.BitDataFileExtractor(Encoding.UTF8);
 
 OUTPUT @key1
-TO @"/BIT_CRM/BIT_Test/key1.csv"
+TO @bucket_1_file
 USING Outputters.Csv();
 
 // https://docs.microsoft.com/en-us/azure/data-lake-analytics/data-lake-analytics-u-sql-get-started
