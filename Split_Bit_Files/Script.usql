@@ -1,4 +1,19 @@
 ﻿USE DATABASE [master];
+
+DECLARE @in string = "/BIT_CRM/input.txt";
+DECLARE @out string = "/BIT_CRM/parsed/output.csv";
+
+@input =
+    EXTRACT rawData string
+    FROM @in
+    USING Extractors.Text();
+
+@bucket_1  =
+    SELECT rawData
+    FROM @input
+    WHERE rawData.Substring(8, 3) == "131"
+	AND rawData.Substring(0, 2) == "D1";
+
 @tbl =
 	EXTRACT
 		RecordID string,
@@ -11,7 +26,7 @@
 		BusinessDate string,
 		ShiftStartDate string,
 		ShiftEndDate string
-	FROM "/BIT_CRM/input.txt"
+	FROM @bucket_1
 	USING new MyCustomExtractors.FixedWidthExtractor (
 		new SQL.MAP<string, string> {
 			{"RecordID","2"},
@@ -26,6 +41,7 @@
 			{"ShiftEndDate","14"}
 		}
 	);
+
 OUTPUT @tbl
-TO "/BIT_CRM/parsed/output.csv"
+TO @out
 USING Outputters.Csv(outputHeader:true, quoting:false);

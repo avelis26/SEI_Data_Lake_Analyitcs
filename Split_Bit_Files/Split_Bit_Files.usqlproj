@@ -25,10 +25,5 @@
       <DependentUpon>Script.usql</DependentUpon>
     </ScriptCode>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="SubStringKey.sql">
-      <SubType>Content</SubType>
-    </None>
-  </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>
