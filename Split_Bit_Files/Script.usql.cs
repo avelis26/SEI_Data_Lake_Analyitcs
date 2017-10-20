@@ -1,58 +1,117 @@
 ﻿using Microsoft.Analytics.Interfaces;
+using Microsoft.Analytics.Types.Sql;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Linq;
+using System.Text;
 
-namespace USQL_Programmability
+namespace MyCustomExtractors
 {
 	[SqlUserDefinedExtractor(AtomicFileProcessing = false)]
-	public class BitDataFileExtractor : IExtractor
+	public class FixedWidthExtractor : IExtractor
 	{
 		private Encoding _encoding;
 		private byte[] _row_delim;
-		private char _col_delim;
-		public BitDataFileExtractor(Encoding encoding, string row_delim = "\r\n", char col_delim = '\t')
+		private SqlMap<string, string> _col_widths;
+
+		public FixedWidthExtractor(SqlMap<string, string> col_widths, Encoding encoding = null, string row_delim = "\r\n")
 		{
 			this._encoding = ((encoding == null) ? Encoding.UTF8 : encoding);
 			this._row_delim = this._encoding.GetBytes(row_delim);
-			this._col_delim = col_delim;
+			this._col_widths = col_widths;
 		}
+
 		public override IEnumerable<IRow> Extract(IUnstructuredReader input, IUpdatableRow output)
 		{
-			string line;
-			//Read the input line by line
-			foreach (Stream current in input.Split(_encoding.GetBytes("\r\n")))
+			foreach (Stream currentline in input.Split(this._row_delim))
 			{
-				using (System.IO.StreamReader streamReader = new StreamReader(current, this._encoding))
+				using (StreamReader lineReader = new StreamReader(currentline, this._encoding))
 				{
-					line = streamReader.ReadToEnd().Trim();
-					//Split the input by the column delimiter
-					string[] parts = line.Split(this._col_delim);
-					int count = 0; // start with first column
-					foreach (string part in parts)
+
+					string line = lineReader.ReadToEnd();
+
+					//read new line of input
+					int start_parse = 0;
+
+					//for each column
+					int i = 0;
+					foreach (var col_width in this._col_widths)
 					{
-						if (count == 0)
-						{  // for column “guid”, re-generated guid
-							Guid new_guid = Guid.NewGuid();
-							output.Set<Guid>(count, new_guid);
-						}
-						else if (count == 2)
+						//read chars associated with fixed-width column
+						int chars_to_read = int.Parse(col_width.Value);
+						string value = line.Substring(start_parse, chars_to_read);
+
+						//assign value to output (w/ appropriate type)
+						switch (output.Schema[i].Type.Name)
 						{
-							// for column “user”, convert to UPPER case
-							output.Set<string>(count, part.ToUpper());
+							case ("String"):
+								output.Set(i, value);
+								break;
+							case ("Int32"):
+								output.Set(i, Int32.Parse(value));
+								break;
+							case ("Single"):
+								output.Set(i, Single.Parse(value));
+								break;
+							case ("Decimal"):
+								output.Set(i, Decimal.Parse(value));
+								break;
+							case ("DateTime"):
+								output.Set(i, DateTime.Parse(value));
+								break;
+							case ("Boolean"):
+								output.Set(i, Boolean.Parse(value));
+								break;
+							case ("Int64"):
+								output.Set(i, Int64.Parse(value));
+								break;
+							case ("Int16"):
+								output.Set(i, Int16.Parse(value));
+								break;
+							case ("Double"):
+								output.Set(i, Double.Parse(value));
+								break;
+							case ("Char"):
+								output.Set(i, Char.Parse(value));
+								break;
+							case ("Guid"):
+								output.Set(i, Guid.Parse(value));
+								break;
+							case ("Byte"):
+								output.Set(i, Byte.Parse(value));
+								break;
+							case ("SByte"):
+								output.Set(i, SByte.Parse(value));
+								break;
+							case ("Byte[]"):
+								output.Set(i, this._encoding.GetBytes(value));
+								break;
+							case ("UInt32"):
+								output.Set(i, UInt32.Parse(value));
+								break;
+							case ("UInt64"):
+								output.Set(i, UInt64.Parse(value));
+								break;
+							case ("UInt16"):
+								output.Set(i, UInt16.Parse(value));
+								break;
+							default:
+								throw (new Exception("Unknown data type specified: " + output.Schema[i].Type.Name));
 						}
-						else
-						{
-							// keep the rest of the columns as-is
-							output.Set<string>(count, part);
-						}
-						count += 1;
+
+						////write data to output as string
+						//output.Set<string>(i, value);
+
+						//move to start of next column
+						start_parse += chars_to_read;
+						i++;
 					}
+
+					//send output 
+					yield return output.AsReadOnly();
 				}
-				yield return output.AsReadOnly();
 			}
-			yield break;
 		}
 	}
 }

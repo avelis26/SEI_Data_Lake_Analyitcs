@@ -1,20 +1,19 @@
-﻿DECLARE @input_file string = @"/BIT_CRM/20170202/ras.dltx.postrn.20161031.092721.00004010";
-DECLARE @bucket_1_file string = @"/BIT_CRM/20170202/bucket_1.csv";
-DECLARE @bucket_2_file string = @"/BIT_CRM/20170202/bucket_2.csv";
-DECLARE @bucket_3_file string = @"/BIT_CRM/20170202/bucket_3.csv";
-
-@key1 =
-	EXTRACT		UserID		int,
-				Start		DateTime,
-				Region		string,
-				Query		string
-FROM @input_file
-USING new USQL_Programmability.BitDataFileExtractor(Encoding.UTF8);
-
-OUTPUT @key1
-TO @bucket_1_file
+﻿USE DATABASE [master];
+@tbl =
+	EXTRACT
+		col1 int,
+		col2 float,
+		col3 decimal,
+		col4 byte[]
+	FROM "/BIT_CRM/input.txt"
+	USING new MyCustomExtractors.FixedWidthExtractor (
+		new SQL.MAP<string, string> {
+			{"col1","3"},
+			{"col2","2"},
+			{"col3","1"},
+			{"col4","2"}
+		}
+	);
+OUTPUT @tbl
+TO "/BIT_CRM/parsed/output.csv"
 USING Outputters.Csv();
-
-// https://docs.microsoft.com/en-us/azure/data-lake-analytics/data-lake-analytics-u-sql-get-started
-// https://saveenr.gitbooks.io/usql-tutorial/content/getting-started/preparing-for-the-tutorial.html
-// https://msdn.microsoft.com/en-us/library/azure/mt796463.aspx
