@@ -1,19 +1,31 @@
 ﻿USE DATABASE [master];
 @tbl =
 	EXTRACT
-		col1 int,
-		col2 float,
-		col3 decimal,
-		col4 byte[]
+		RecordID string,
+		StoreNumber string,
+		TransactionType string,
+		BackOfficeDayStatus string,
+		POSPostingDayStatus string,
+		DayNumber string,
+		ShiftNumber string,
+		BusinessDate string,
+		ShiftStartDate string,
+		ShiftEndDate string
 	FROM "/BIT_CRM/input.txt"
 	USING new MyCustomExtractors.FixedWidthExtractor (
 		new SQL.MAP<string, string> {
-			{"col1","3"},
-			{"col2","2"},
-			{"col3","1"},
-			{"col4","2"}
+			{"RecordID","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"BackOfficeDayStatus","1"},
+			{"POSPostingDayStatus","1"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"BusinessDate","8"},
+			{"ShiftStartDate","14"},
+			{"ShiftEndDate","14"}
 		}
 	);
 OUTPUT @tbl
 TO "/BIT_CRM/parsed/output.csv"
-USING Outputters.Csv();
+USING Outputters.Csv(outputHeader:true, quoting:false);

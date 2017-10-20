@@ -26,9 +26,9 @@
     </ScriptCode>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SubStringKey.sql">
+    <None Include="SubStringKey.sql">
       <SubType>Content</SubType>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>
