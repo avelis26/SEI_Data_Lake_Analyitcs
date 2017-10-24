@@ -1,14 +1,14 @@
 ﻿USE DATABASE [master];
 
-DECLARE @in string = "/BIT_CRM/input.txt";
-DECLARE @out string = "/BIT_CRM/parsed/output.csv";
+DECLARE @in string = "/BIT_CRM/20170218/test.txt";
+DECLARE @out string = "/BIT_CRM/20170218/output.csv";
 
 @input =
     EXTRACT rawData string
     FROM @in
     USING Extractors.Text();
 
-@bucket_1  =
+@bucket_1 =
     SELECT rawData
     FROM @input
     WHERE rawData.Substring(8, 3) == "131"
