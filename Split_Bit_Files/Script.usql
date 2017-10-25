@@ -1,4 +1,4 @@
-﻿USE DATABASE [master];
+﻿mUSE DATABASE [master];
 
 DECLARE @in string = "/BIT_CRM/20170218/test.txt";
 DECLARE @out string = "/BIT_CRM/20170218/output.csv";
