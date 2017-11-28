@@ -1,20 +1,10 @@
 ﻿USE DATABASE [master];
 
-DECLARE @in string = "/BIT_CRM/input.txt";
-DECLARE @out string = "/BIT_CRM/parsed/output.csv";
+DECLARE @in string = "/BIT_CRM/sample_data/{*}";
+DECLARE @d1_131 string = "/Parsed/d1_131_output.csv";
+DECLARE @d1_121 string = "/Parsed/d1_121_output.csv";
 
-@input =
-    EXTRACT rawData string
-    FROM @in
-    USING Extractors.Text();
-
-@bucket_1  =
-    SELECT rawData
-    FROM @input
-    WHERE rawData.Substring(8, 3) == "131"
-	AND rawData.Substring(0, 2) == "D1";
-
-@tbl =
+@bucket_D1_131 =
 	EXTRACT
 		RecordID string,
 		StoreNumber string,
@@ -26,8 +16,8 @@ DECLARE @out string = "/BIT_CRM/parsed/output.csv";
 		BusinessDate string,
 		ShiftStartDate string,
 		ShiftEndDate string
-	FROM @bucket_1
-	USING new MyCustomExtractors.FixedWidthExtractor (
+	FROM @in
+	USING new MyCustomExtractors.D1_131_Extractor (
 		new SQL.MAP<string, string> {
 			{"RecordID","2"},
 			{"StoreNumber","6"},
@@ -41,7 +31,55 @@ DECLARE @out string = "/BIT_CRM/parsed/output.csv";
 			{"ShiftEndDate","14"}
 		}
 	);
+OUTPUT @bucket_D1_131
+TO @d1_131
+USING Outputters.Csv(outputHeader:true, quoting:false);
 
-OUTPUT @tbl
-TO @out
+@bucket_D1_121 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		Aborted string,
+		DeviceNumber string,
+		DeviceType string,
+		EmployeeNumber string,
+		EndDate string,
+		EndTime string,
+		StartDate string,
+		StartTime string,
+		Status string,
+		TotalAmount string,
+		TransactionCode string,
+		TransactionSequence string,
+		RewardMemberID string
+	FROM @in
+	USING new MyCustomExtractors.D1_121_Extractor (
+		new SQL.MAP<string, string> {
+			{"RecordId","02"},
+			{"StoreNumber","06"},
+			{"TransactionType","03"},
+			{"DayNumber","06"},
+			{"ShiftNumber","06"},
+			{"TransactionUID","11"},
+			{"Aborted","01"},
+			{"DeviceNumber","06"},
+			{"DeviceType","06"},
+			{"EmployeeNumber","06"},
+			{"EndDate","08"},
+			{"EndTime","06"},
+			{"StartDate","08"},
+			{"StartTime","06"},
+			{"Status","01"},
+			{"TotalAmount","11"},
+			{"TransactionCode","06"},
+			{"TransactionSequence","11"},
+			{"7RewardMemberID","19"}
+		}
+	);
+OUTPUT @bucket_D1_121
+TO @d1_121
 USING Outputters.Csv(outputHeader:true, quoting:false);
