@@ -1,0 +1,1230 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = "/BIT_CRM/20171128/{*}";
+DECLARE @d1_120 string = "/Parsed/d1_120_output.csv";
+@bucket_D1_120 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionDate string,
+		CardAccountNumber string,
+		EmployeeNumber string,
+		SequenceNumber string,
+		DeviceNumber string,
+		ApprovalCode string,
+		ResponseCode string,
+		STTNumber string,
+		LoadAmount string,
+		FeeAmount string,
+		CardBalance string,
+		VoidFlag string,
+		EmbeddedFee string,
+		VendorFee string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","4"},
+			{"ShiftNumber","4"},
+			{"TransactionDate","14"},
+			{"CardAccountNumber","19"},
+			{"EmployeeNumber","6"},
+			{"SequenceNumber","11"},
+			{"DeviceNumber","3"},
+			{"ApprovalCode","9"},
+			{"ResponseCode","4"},
+			{"STTNumber","6"},
+			{"LoadAmount","6"},
+			{"FeeAmount","6"},
+			{"CardBalance","6"},
+			{"VoidFlag","1"},
+			{"EmbeddedFee","6"},
+			{"VendorFee","6"}
+		},
+		"120",
+		"D1"
+	);
+OUTPUT @bucket_D1_120
+TO @d1_120
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_121 string = "/Parsed/d1_121_output.csv";
+@bucket_D1_121 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		Aborted string,
+		DeviceNumber string,
+		DeviceType string,
+		EmployeeNumber string,
+		EndDate string,
+		EndTime string,
+		StartDate string,
+		StartTime string,
+		Status string,
+		TotalAmount string,
+		TransactionCode string,
+		TransactionSequence string,
+		RewardMemberID string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"Aborted","1"},
+			{"DeviceNumber","6"},
+			{"DeviceType","6"},
+			{"EmployeeNumber","6"},
+			{"EndDate","8"},
+			{"EndTime","6"},
+			{"StartDate","8"},
+			{"StartTime","6"},
+			{"Status","1"},
+			{"TotalAmount","11"},
+			{"TransactionCode","6"},
+			{"TransactionSequence","11"},
+			{"RewardMemberID","19"}
+		},
+		"121",
+		"D1"
+	);
+OUTPUT @bucket_D1_121
+TO @d1_121
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_122 string = "/Parsed/d1_122_output.csv";
+@bucket_D1_122 =
+	EXTRACT
+		RecordID string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		ProductNumber string,
+		PLUNumber string,
+		RecordAmount string,
+		RecordCount string,
+		RecordType string,
+		SizeIndx string,
+		ErrorCorrectionFlag string,
+		PriceOverideFlag string,
+		TaxableFlag string,
+		VoidFlag string,
+		RecommendedFlag string,
+		PriceMultiple string,
+		CarryStatus string,
+		TaxOverideFlag string,
+		PromotionCount string,
+		SalesPrice string,
+		MUBasePrice string,
+		HostItemId string,
+		CouponCount string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordID","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"ProductNumber","11"},
+			{"PLUNumber","14"},
+			{"RecordAmount","11"},
+			{"RecordCount","6"},
+			{"RecordType","6"},
+			{"SizeIndx","1"},
+			{"ErrorCorrectionFlag","1"},
+			{"PriceOverideFlag","1"},
+			{"TaxableFlag","1"},
+			{"VoidFlag","1"},
+			{"RecommendedFlag","1"},
+			{"PriceMultiple","6"},
+			{"CarryStatus","6"},
+			{"TaxOverideFlag","1"},
+			{"PromotionCount","2"},
+			{"SalesPrice","4"},
+			{"MUBasePrice","4"},
+			{"HostItemId","14"},
+			{"CouponCount","10"}
+		},
+		"122",
+		"D1"
+	);
+OUTPUT @bucket_D1_122
+TO @d1_122
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_123 string = "/Parsed/d1_123_output.csv";
+@bucket_D1_123 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		DepartmentNumber string,
+		SubDepartment string,
+		RecordType string,
+		RecordCount string,
+		RecordAmount string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		TaxableFlag string,
+		PriceOverideFlag string,
+		TaxOverideFlag string,
+		HostItemId string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"DepartmentNumber","6"},
+			{"SubDepartment","6"},
+			{"RecordType","6"},
+			{"RecordCount","6"},
+			{"RecordAmount","11"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"TaxableFlag","1"},
+			{"PriceOverideFlag","1"},
+			{"TaxOverideFlag","1"},
+			{"HostItemId","14"}
+		},
+		"123",
+		"D1"
+	);
+OUTPUT @bucket_D1_123
+TO @d1_123
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_124 string = "/Parsed/d1_124_output.csv";
+@bucket_D1_124 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		MediaNumber string,
+		NetworkMediaSequenceNumber string,
+		MediaType string,
+		RecordCount string,
+		RecordAmount string,
+		RecordType string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		ExchangeRate string,
+		ForeignAmount string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"MediaNumber","6"},
+			{"NetworkMediaSequenceNumber","11"},
+			{"MediaType","2"},
+			{"RecordCount","6"},
+			{"RecordAmount","11"},
+			{"RecordType","6"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"ExchangeRate","5"},
+			{"ForeignAmount","11"}
+		},
+		"124",
+		"D1"
+	);
+OUTPUT @bucket_D1_124
+TO @d1_124
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_125 string = "/Parsed/d1_125_output.csv";
+@bucket_D1_125 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		ErrorCorrectionFlag string,
+		RecordType string,
+		RecordAmount string,
+		TaxTable string,
+		IsVoid string,
+		IsDeduct string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"ErrorCorrectionFlag","1"},
+			{"RecordType","6"},
+			{"RecordAmount","11"},
+			{"TaxTable","6"},
+			{"IsVoid","1"},
+			{"IsDeduct","1"}},
+		"125",
+		"D1"
+	);
+OUTPUT @bucket_D1_125
+TO @d1_125
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_127 string = "/Parsed/d1_127_output.csv";
+@bucket_D1_127 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumbar string,
+		Comments string,
+		RecordType string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumbar","11"},
+			{"Comments","80"},
+			{"RecordType","6"}
+		},
+		"127",
+		"D1"
+	);
+OUTPUT @bucket_D1_127
+TO @d1_127
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_128 string = "/Parsed/d1_128_output.csv";
+@bucket_D1_128 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		ErrorCorrectionFlag string,
+		Amount string,
+		MediaNumber string,
+		ReasonCode string,
+		RecordType string,
+		TerminalNumber string,
+		VoidFlag string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"ErrorCorrectionFlag","1"},
+			{"Amount","11"},
+			{"MediaNumber","6"},
+			{"ReasonCode","6"},
+			{"RecordType","6"},
+			{"TerminalNumber","6"},
+			{"VoidFlag","1"}
+		},
+		"128",
+		"D1"
+	);
+OUTPUT @bucket_D1_128
+TO @d1_128
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_129 string = "/Parsed/d1_129_output.csv";
+@bucket_D1_129 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		ErrorCorrectionFlag string,
+		Amount string,
+		MediaNumber string,
+		ReasonCode string,
+		RecordType string,
+		TerminalNumber string,
+		VoidFlag string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"ErrorCorrectionFlag","1"},
+			{"Amount","11"},
+			{"MediaNumber","6"},
+			{"ReasonCode","6"},
+			{"RecordType","6"},
+			{"TerminalNumber","6"},
+			{"VoidFlag","1"}
+		},
+		"129",
+		"D1"
+	);
+OUTPUT @bucket_D1_129
+TO @d1_129
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_130 string = "/Parsed/d1_130_output.csv";
+@bucket_D1_130 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		RecordType string,
+		DispenserNumber string,
+		SaleProductId string,
+		HoseNumber string,
+		MediaNumber string,
+		ServiceLevelId string,
+		PricePerUnit string,
+		SaleVolume string,
+		CreePage string,
+		RecordAmount string,
+		FuelPriceTable string,
+		FuelPriceGroup string,
+		PrimaryTankNumber string,
+		PrimaryTankVolume string,
+		SecondaryTankNumber string,
+		SecondaryTankVolume string,
+		ManualFlag string,
+		AutoFinalFlag string,
+		DeviceType string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		PrepayFlag string,
+		MediaAdjustAmount string,
+		AdjustPricePerUnit string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"RecordType","6"},
+			{"DispenserNumber","6"},
+			{"SaleProductId","6"},
+			{"HoseNumber","6"},
+			{"MediaNumber","6"},
+			{"ServiceLevelId","6"},
+			{"PricePerUnit","11"},
+			{"SaleVolume","11"},
+			{"CreePage","11"},
+			{"RecordAmount","11"},
+			{"FuelPriceTable","6"},
+			{"FuelPriceGroup","6"},
+			{"PrimaryTankNumber","6"},
+			{"PrimaryTankVolume","11"},
+			{"SecondaryTankNumber","6"},
+			{"SecondaryTankVolume","11"},
+			{"ManualFlag","1"},
+			{"AutoFinalFlag","1"},
+			{"DeviceType","6"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"PrepayFlag","1"},
+			{"MediaAdjustAmount","11"},
+			{"AdjustPricePerUnit","11"}
+		},
+		"130",
+		"D1"
+	);
+OUTPUT @bucket_D1_130
+TO @d1_130
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_131 string = "/Parsed/d1_131_output.csv";
+@bucket_D1_131 =
+	EXTRACT
+		RecordID string,
+		StoreNumber string,
+		TransactionType string,
+		BackOfficeDayStatus string,
+		POSPostingDayStatus string,
+		DayNumber string,
+		ShiftNumber string,
+		BusinessDate string,
+		ShiftStartDate string,
+		ShiftEndDate string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordID","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"BackOfficeDayStatus","1"},
+			{"POSPostingDayStatus","1"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"BusinessDate","8"},
+			{"ShiftStartDate","14"},
+			{"ShiftEndDate","14"}
+		},
+		"131",
+		"D1"
+	);
+OUTPUT @bucket_D1_131
+TO @d1_131
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_132 string = "/Parsed/d1_132_output.csv";
+@bucket_D1_132 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		TransactionCode string,
+		TransactionDescription string,
+		AddOrSubstruct string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"TransactionCode","6"},
+			{"TransactionDescription","20"},
+			{"AddOrSubstruct","6"}
+		},
+		"132",
+		"D1"
+	);
+OUTPUT @bucket_D1_132
+TO @d1_132
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_133 string = "/Parsed/d1_133_output.csv";
+@bucket_D1_133 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		LoadSaleSequenceNumber string,
+		RecordType string,
+		LoadAmount string,
+		BalanceAmount string,
+		AccountNumber string,
+		STTNumber string,
+		AuthorizationTime string,
+		AuthorizationNumber string,
+		AuthorizationCode string,
+		NetworkTerminal string,
+		NetworkLocalTerminal string,
+		PLUNumber string,
+		ItemId string,
+		ItmCostAmount string,
+		VendorId string,
+		FeeAmount string,
+		FeeAmountEmbedded string,
+		FeeAmountVendor string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"LoadSaleSequenceNumber","11"},
+			{"RecordType","4"},
+			{"LoadAmount","6"},
+			{"BalanceAmount","6"},
+			{"AccountNumber","19"},
+			{"STTNumber","6"},
+			{"AuthorizationTime","6"},
+			{"AuthorizationNumber","12"},
+			{"AuthorizationCode","6"},
+			{"NetworkTerminal","12"},
+			{"NetworkLocalTerminal","2"},
+			{"PLUNumber","14"},
+			{"ItemId","11"},
+			{"ItmCostAmount","11"},
+			{"VendorId","11"},
+			{"FeeAmount","6"},
+			{"FeeAmountEmbedded","6"},
+			{"FeeAmountVendor","6"}
+		},
+		"133",
+		"D1"
+	);
+OUTPUT @bucket_D1_133
+TO @d1_133
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_134 string = "/Parsed/d1_134_output.csv";
+@bucket_D1_134 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		EmployeeNumber string,
+		EmployeeName string,
+		Password string,
+		ClassId string,
+		SecurityLevel string,
+		Ssn string,
+		PasswordChangeDate string,
+		Password2 string,
+		Password3 string,
+		Password4 string,
+		Password5 string,
+		Password6 string,
+		LockoutDate string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"EmployeeNumber","6"},
+			{"EmployeeName","30"},
+			{"Password","8"},
+			{"ClassId","8"},
+			{"SecurityLevel","1"},
+			{"SSN","9"},
+			{"PasswordChangeDate","14"},
+			{"Password2","8"},
+			{"Password3","8"},
+			{"Password4","8"},
+			{"Password5","8"},
+			{"Password6","8"},
+			{"LockoutDate","14"}
+		},
+		"134",
+		"D1"
+	);
+OUTPUT @bucket_D1_134
+TO @d1_134
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_135 string = "/Parsed/d1_135_output.csv";
+@bucket_D1_135 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		TerminalNumber string,
+		Scanner string,
+		MsrPort string,
+		CustomerDisplayPort string,
+		PinPadPort string,
+		ForceDrop string,
+		IsCloseDrawer string,
+		IsShowSafeDrop string,
+		IsOpenDrawer string,
+		IsShiftSignOn string,
+		IsPumpInterface string,
+		IsAuditEOS string,
+		IsRevenueEOS string,
+		IsNetworkBatchEOS string,
+		IsAcceptEOS string,
+		IsAuditEOD string,
+		IsRevenueEOD string,
+		IsNetworkEOD string,
+		IsAcceptEOD string,
+		TerminalType string,
+		AlarmDropAmount string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"TerminalNumber","6"},
+			{"Scanner","6"},
+			{"MsrPort","6"},
+			{"CustomerDisplayPort","6"},
+			{"PinPadPort","6"},
+			{"ForceDrop","6"},
+			{"IsCloseDrawer","1"},
+			{"IsShowSafeDrop","1"},
+			{"IsOpenDrawer","1"},
+			{"IsShiftSignOn","1"},
+			{"IsPumpInterface","1"},
+			{"IsAuditEOS","1"},
+			{"IsRevenueEOS","1"},
+			{"IsNetworkBatchEOS","1"},
+			{"IsAcceptEOS","1"},
+			{"IsAuditEOD","1"},
+			{"IsRevenueEOD","1"},
+			{"IsNetworkEOD","1"},
+			{"IsAcceptEOD","1"},
+			{"TerminalType","5"},
+			{"AlarmDropAmount","6"}
+		},
+		"135",
+		"D1"
+	);
+OUTPUT @bucket_D1_135
+TO @d1_135
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_136 string = "/Parsed/d1_136_output.csv";
+@bucket_D1_136 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		RecordType string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		TaxableFlag string,
+		TaxOverideFlag string,
+		PromotionId string,
+		RecordCount string,
+		RecordAmount string,
+		PromotionProductCode string,
+		DepartmentNumber string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"RecordType","6"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"TaxableFlag","1"},
+			{"TaxOverideFlag","1"},
+			{"PromotionId","6"},
+			{"RecordCount","6"},
+			{"RecordAmount","6"},
+			{"PromotionProductCode","6"},
+			{"DepartmentNumber","6"}
+		},
+		"136",
+		"D1"
+	);
+OUTPUT @bucket_D1_136
+TO @d1_136
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_137 string = "/Parsed/d1_137_output.csv";
+@bucket_D1_137 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		OwnerSequenceNumber string,
+		PromotionSequenceNumber string,
+		RecordAmount string,
+		RecordCount string,
+		PromotionGroupId string,
+		ThresholdQty string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"OwnerSequenceNumber","11"},
+			{"PromotionSequenceNumber","11"},
+			{"RecordAmount","6"},
+			{"RecordCount","6"},
+			{"PromotionGroupId","4"},
+			{"ThresholdQty","4"}
+		},
+		"137",
+		"D1"
+	);
+OUTPUT @bucket_D1_137
+TO @d1_137
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_138 string = "/Parsed/d1_138_output.csv";
+@bucket_D1_138 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		TransactionDate string,
+		TransactionHour string,
+		MerchandiseAmount string,
+		GasSalesAmount string,
+		MerchandiseCount string,
+		GasSaleCount string,
+		POSCount string,
+		CRINDCount string,
+		PeriodCode string,
+		ExpiryDate string,
+		MerchandiseUnits string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"TransactionDate","8"},
+			{"TransactionHour","11"},
+			{"MerchandiseAmount","11"},
+			{"GasSalesAmount","11"},
+			{"MerchandiseCount","11"},
+			{"GasSaleCount","11"},
+			{"POSCount","11"},
+			{"CRINDCount","11"},
+			{"PeriodCode","1"},
+			{"ExpiryDate","8"},
+			{"MerchandiseUnits","11"}
+		},
+		"138",
+		"D1"
+	);
+OUTPUT @bucket_D1_138
+TO @d1_138
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_139 string = "/Parsed/d1_139_output.csv";
+@bucket_D1_139 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		OwnerSequenceNumber string,
+		AccountNumber string,
+		BatchNumber string,
+		BatchSequenceNumber string,
+		CardTransactionFee string,
+		RecordType string,
+		ReponseCodeText string,
+		AuthorizationNumber string,
+		AuthorizationCode1 string,
+		AuthorizationCode2 string,
+		CustomerName string,
+		EntryType string,
+		ExpirationDate string,
+		AuthorizationTime string,
+		VehicleNumber string,
+		OdometerReading string,
+		DriverNumber string,
+		CustomizedReferenceNumber string,
+		AccountType string,
+		AuthorizationTraceId string,
+		AuthorizationPartyName string,
+		STTNumber string,
+		BalanceAmount string,
+		MaskedAccountNumber string,
+		RoutingNumber string,
+		CheckNumber string,
+		CardType string,
+		Amount string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"OwnerSequenceNumber","4"},
+			{"AccountNumber","40"},
+			{"BatchNumber","10"},
+			{"BatchSequenceNumber","10"},
+			{"CardTransactionFee","4"},
+			{"RecordType","6"},
+			{"ReponseCodeText","12"},
+			{"AuthorizationNumber","12"},
+			{"AuthorizationCode1","6"},
+			{"AuthorizationCode2","6"},
+			{"CustomerName","26"},
+			{"EntryType","10"},
+			{"ExpirationDate","4"},
+			{"AuthorizationTime","6"},
+			{"VehicleNumber","10"},
+			{"OdometerReading","10"},
+			{"DriverNumber","10"},
+			{"CustomizedReferenceNumber","14"},
+			{"AccountType","3"},
+			{"AuthorizationTraceId","6"},
+			{"AuthorizationPartyName","20"},
+			{"STTNumber","6"},
+			{"BalanceAmount","4"},
+			{"MaskedAccountNumber","40"},
+			{"RoutingNumber","9"},
+			{"CheckNumber","10"},
+			{"CardType","10"},
+			{"Amount","11"}
+		},
+		"139",
+		"D1"
+	);
+OUTPUT @bucket_D1_139
+TO @d1_139
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_140 string = "/Parsed/d1_140_output.csv";
+@bucket_D1_140 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		MoneyOrderSaleAmount string,
+		MoneyOrderFeeAmount string,
+		MoneyOrderSerialNumber string,
+		MoneyOrderDepartmentSaleSeqNumber string,
+		MoneyOrderDepartmentFeeNumber string,
+		MoneyOrderPrintedFlg string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"MoneyOrderSaleAmount","6"},
+			{"MoneyOrderFeeAmount","4"},
+			{"MoneyOrderSerialNumber","12"},
+			{"MoneyOrderDepartmentSaleSeqNumber","10"},
+			{"MoneyOrderDepartmentFeeNumber","10"},
+			{"MoneyOrderPrintedFlg","10"}
+		},
+		"140",
+		"D1"
+	);
+OUTPUT @bucket_D1_140
+TO @d1_140
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_409 string = "/Parsed/d1_409_output.csv";
+@bucket_D1_409 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		CouponId string,
+		CouponDescription string,
+		PLUNumber string,
+		CouponType string,
+		CouponValueCode string,
+		EntryMethod string,
+		HostMediaNumber string,
+		RecordAmount string,
+		RecordCount string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		TaxableFlag string,
+		TaxOverrideFlag string,
+		AnnulFlag string,
+		PrimaryCompanyId string,
+		OfferCode string,
+		SaveValue string,
+		PrimaryPurchaseRequirement string,
+		PrimaryPurchaseRequirementCode string,
+		PrimaryPurchaseFamilyCode string,
+		AdditionalPurchaseRulesCode string,
+		SecondPurchaseRequirement string,
+		SecondPurchaseRequirementCode string,
+		SecondPurchaseFamilyCode string,
+		SecondCompanyId string,
+		ThirdPurchaseRequirement string,
+		ThirdPurchaseRequirementCode string,
+		ThirdPurchaseFamilyCode string,
+		ThirdCompanyId string,
+		ExpirationDate string,
+		StartDate string,
+		SerialNumber string,
+		RetailerId string,
+		SaveValueCode string,
+		DiscountedItem string,
+		StoreCouponIndicator string,
+		NoMultiplyFlag string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","9"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","9"},
+			{"SequenceNumber","9"},
+			{"CouponId","9"},
+			{"CouponDescription","18"},
+			{"PLUNumber","22"},
+			{"CouponType","2"},
+			{"CouponValueCode","2"},
+			{"EntryMethod","9"},
+			{"HostMediaNumber","9"},
+			{"RecordAmount","9"},
+			{"RecordCount","9"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"TaxableFlag","1"},
+			{"TaxOverrideFlag","1"},
+			{"AnnulFlag","1"},
+			{"PrimaryCompanyId","15"},
+			{"OfferCode","6"},
+			{"SaveValue","9"},
+			{"PrimaryPurchaseRequirement","9"},
+			{"PrimaryPurchaseRequirementCode","1"},
+			{"PrimaryPurchaseFamilyCode","3"},
+			{"AdditionalPurchaseRulesCode","1"},
+			{"SecondPurchaseRequirement","9"},
+			{"SecondPurchaseRequirementCode","1"},
+			{"SecondPurchaseFamilyCode","3"},
+			{"SecondCompanyId","15"},
+			{"ThirdPurchaseRequirement","9"},
+			{"ThirdPurchaseRequirementCode","1"},
+			{"ThirdPurchaseFamilyCode","3"},
+			{"ThirdCompanyId","15"},
+			{"ExpirationDate","6"},
+			{"StartDate","6"},
+			{"SerialNumber","15"},
+			{"RetailerId","15"},
+			{"SaveValueCode","1"},
+			{"DiscountedItem","1"},
+			{"StoreCouponIndicator","1"},
+			{"NoMultiplyFlag","1"}
+		},
+		"409",
+		"D1"
+	);
+OUTPUT @bucket_D1_409
+TO @d1_409
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_411 string = "/Parsed/d1_411_output.csv";
+@bucket_D1_411 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		SafeActivityType string,
+		SafeMediaNumber string,
+		SafeMediaType string,
+		POSAmount string,
+		SafeAmount string,
+		ForeignAmount string,
+		EnvelopeNumber string,
+		CommunicationStatus string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"SafeActivityType","1"},
+			{"SafeMediaNumber","6"},
+			{"SafeMediaType","2"},
+			{"POSAmount","11"},
+			{"SafeAmount","11"},
+			{"ForeignAmount","11"},
+			{"EnvelopeNumber","6"},
+			{"CommunicationStatus","1"}
+		},
+		"411",
+		"D1"
+	);
+OUTPUT @bucket_D1_411
+TO @d1_411
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_462 string = "/Parsed/d1_462_output.csv";
+@bucket_D1_462 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		ItemId string,
+		PLUNumber string,
+		BestBeforeDate string,
+		SellByDate string,
+		ExpirationDate string,
+		ExpirationDateTime string,
+		RejectedReason string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","9"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","9"},
+			{"SequenceNumber","9"},
+			{"ItemId","9"},
+			{"PLUNumber","14"},
+			{"BestBeforeDate","6"},
+			{"SellByDate","6"},
+			{"ExpirationDate","6"},
+			{"ExpirationDateTime","10"},
+			{"RejectedReason","80"}
+		},
+		"462",
+		"D1"
+	);
+OUTPUT @bucket_D1_462
+TO @d1_462
+USING Outputters.Csv(outputHeader:true, quoting:false);
+DECLARE @d1_463 string = "/Parsed/d1_463_output.csv";
+@bucket_D1_463 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		PLUNumber string,
+		PrimaryCompany string,
+		OfferCode string,
+		SaveValue string,
+		PrimaryPurchaseRequirement string,
+		PrimaryPurchaseRequirementCode string,
+		PrimaryPurchaseFamilyCode string,
+		AdditionalPurchaseRulesCode string,
+		SecondPurchaseRequirement string,
+		SecondPurchaseRequirementCode string,
+		SecondPurchaseFamilyCode string,
+		SecondCompany string,
+		ThirdPurchaseRequirement string,
+		ThirdPurchaseRequirementCode string,
+		ThirdPurchaseFamilyCode string,
+		ThirdCompany string,
+		ExpirationDate string,
+		StartDate string,
+		SerialNumber string,
+		RetailerID string,
+		SaveValueCode string,
+		DiscountedItem string,
+		IsStoreCoupon string,
+		IsMultiple string,
+		RejectReason string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","9"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","9"},
+			{"SequenceNumber","9"},
+			{"PLUNumber","22"},
+			{"PrimaryCompany","15"},
+			{"OfferCode","6"},
+			{"SaveValue","9"},
+			{"PrimaryPurchaseRequirement","9"},
+			{"PrimaryPurchaseRequirementCode","1"},
+			{"PrimaryPurchaseFamilyCode","3"},
+			{"AdditionalPurchaseRulesCode","1"},
+			{"SecondPurchaseRequirement","9"},
+			{"SecondPurchaseRequirementCode","1"},
+			{"SecondPurchaseFamilyCode","3"},
+			{"SecondCompany","15"},
+			{"ThirdPurchaseRequirement","9"},
+			{"ThirdPurchaseRequirementCode","1"},
+			{"ThirdPurchaseFamilyCode","3"},
+			{"ThirdCompany","15"},
+			{"ExpirationDate","6"},
+			{"StartDate","6"},
+			{"SerialNumber","15"},
+			{"RetailerID","15"},
+			{"SaveValueCode","1"},
+			{"DiscountedItem","1"},
+			{"IsStoreCoupon","1"},
+			{"IsMultiple","1"},
+			{"RejectReason","80"}
+		},
+		"463",
+		"D1"
+	);
+OUTPUT @bucket_D1_463
+TO @d1_463
+USING Outputters.Csv(outputHeader:true, quoting:false);
