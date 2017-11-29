@@ -12,7 +12,7 @@ namespace MyCustomExtractors {
 		private Encoding _encoding;
 		private byte[] _row_delim;
 		private SqlMap<string, string> _col_widths;
-		public FixedWidthExtractor(SqlMap<string, string> col_widths, string transType = null, string recordID = null, Encoding encoding = null, string row_delim = "\r\n") {
+		public FixedWidthExtractor(SqlMap<string, string> col_widths, string transType = null, string recordID = null, Encoding encoding = null, string row_delim = "\n") {
 			this._encoding = ((encoding == null) ? Encoding.UTF8 : encoding);
 			this._row_delim = this._encoding.GetBytes(row_delim);
 			this._col_widths = col_widths;
