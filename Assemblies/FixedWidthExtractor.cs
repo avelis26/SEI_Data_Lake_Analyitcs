@@ -3,7 +3,8 @@ using Microsoft.Analytics.Types.Sql;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-namespace MyCustomExtractors {
+
+namespace CustomExtractors {
 	[SqlUserDefinedExtractor(AtomicFileProcessing = false)]
 	public class FixedWidthExtractor : IExtractor {
 		private string _transType;

@@ -7,7 +7,7 @@
     <OutputType>File</OutputType>
     <AssemblyName>Algebra.xml</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
-    <Name>Split_Bit_Files</Name>
+    <Name>Parse_SEI_BIT_Data</Name>
     <RootNamespace>Split_Bit_Files</RootNamespace>
     <RuntimeVersion>default</RuntimeVersion>
   </PropertyGroup>
@@ -21,9 +21,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Script Include="D1_120.usql" />
-    <ScriptCode Include="D1_120.usql.cs">
-      <DependentUpon>D1_120.usql</DependentUpon>
-    </ScriptCode>
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>

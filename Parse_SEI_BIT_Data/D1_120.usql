@@ -1,7 +1,7 @@
 ﻿USE DATABASE [master];
-DECLARE @in string = "/BIT_CRM/sample_data/{*}";
-DECLARE @d1_120 string = "/Parsed/d1_120_output.csv";
-
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = new Constants.InputFileLocations.getInputFolderPath();
+DECLARE @d1_120 string = new Constants.OutputFileLocations.getD1_120path();
 @bucket_D1_120 =
 	EXTRACT
 		RecordId string,
@@ -24,7 +24,7 @@ DECLARE @d1_120 string = "/Parsed/d1_120_output.csv";
 		EmbeddedFee string,
 		VendorFee string
 	FROM @in
-	USING new MyCustomExtractors.FixedWidthExtractor(
+	USING new CustomExtractors.FixedWidthExtractor(
 		new SQL.MAP<string, string> {
 			{"RecordId","2"},
 			{"StoreNumber","6"},
