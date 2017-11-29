@@ -6,11 +6,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace Constants {
-	public class InputFileLocations {
-		public static string getInputFolderPath() {
-			string path = "/BIT_CRM/20171128/{*}";
-			return path;
+namespace FilePaths {
+	static public class Input {
+		static public string GetInputPath() {
+			string inputPath = "/BIT_CRM/bit_test_compressed/{*}";
+			return inputPath;
+		}
+	}
+	static public class Output {
+		static public string GetD1121OutputPath() {
+			string outputPath = "/BIT_CRM/bit_test_compressed/d1_121_output.csv";
+			return outputPath;
 		}
 	}
 }
