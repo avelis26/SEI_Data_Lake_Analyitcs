@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CustomExtractors {
+namespace MyCustomExtractors {
 	[SqlUserDefinedExtractor(AtomicFileProcessing = false)]
 	public class FixedWidthExtractor : IExtractor {
 		private string _transType;

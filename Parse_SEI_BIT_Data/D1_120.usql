@@ -24,7 +24,7 @@ DECLARE @d1_120 string = "/Parsed/d1_120_output.csv";
 		EmbeddedFee string,
 		VendorFee string
 	FROM @in
-	USING new CustomExtractors.FixedWidthExtractor(
+	USING new MyCustomExtractors.FixedWidthExtractor(
 		new SQL.MAP<string, string> {
 			{"RecordId","2"},
 			{"StoreNumber","6"},
