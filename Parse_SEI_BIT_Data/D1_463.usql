@@ -1,0 +1,80 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = "/BIT_CRM/20171128/{*}";
+DECLARE @d1_463 string = "/Parsed/d1_463_output.csv";
+@bucket_D1_463 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		PLUNumber string,
+		PrimaryCompany string,
+		OfferCode string,
+		SaveValue string,
+		PrimaryPurchaseRequirement string,
+		PrimaryPurchaseRequirementCode string,
+		PrimaryPurchaseFamilyCode string,
+		AdditionalPurchaseRulesCode string,
+		SecondPurchaseRequirement string,
+		SecondPurchaseRequirementCode string,
+		SecondPurchaseFamilyCode string,
+		SecondCompany string,
+		ThirdPurchaseRequirement string,
+		ThirdPurchaseRequirementCode string,
+		ThirdPurchaseFamilyCode string,
+		ThirdCompany string,
+		ExpirationDate string,
+		StartDate string,
+		SerialNumber string,
+		RetailerID string,
+		SaveValueCode string,
+		DiscountedItem string,
+		IsStoreCoupon string,
+		IsMultiple string,
+		RejectReason string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","9"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","9"},
+			{"SequenceNumber","9"},
+			{"PLUNumber","22"},
+			{"PrimaryCompany","15"},
+			{"OfferCode","6"},
+			{"SaveValue","9"},
+			{"PrimaryPurchaseRequirement","9"},
+			{"PrimaryPurchaseRequirementCode","1"},
+			{"PrimaryPurchaseFamilyCode","3"},
+			{"AdditionalPurchaseRulesCode","1"},
+			{"SecondPurchaseRequirement","9"},
+			{"SecondPurchaseRequirementCode","1"},
+			{"SecondPurchaseFamilyCode","3"},
+			{"SecondCompany","15"},
+			{"ThirdPurchaseRequirement","9"},
+			{"ThirdPurchaseRequirementCode","1"},
+			{"ThirdPurchaseFamilyCode","3"},
+			{"ThirdCompany","15"},
+			{"ExpirationDate","6"},
+			{"StartDate","6"},
+			{"SerialNumber","15"},
+			{"RetailerID","15"},
+			{"SaveValueCode","1"},
+			{"DiscountedItem","1"},
+			{"IsStoreCoupon","1"},
+			{"IsMultiple","1"},
+			{"RejectReason","80"}
+		},
+		"463",
+		"D1"
+	);
+OUTPUT @bucket_D1_463
+TO @d1_463
+USING Outputters.Csv(outputHeader:true, quoting:false);

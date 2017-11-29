@@ -1,0 +1,86 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = "/BIT_CRM/20171128/{*}";
+DECLARE @d1_139 string = "/Parsed/d1_139_output.csv";
+@bucket_D1_139 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		OwnerSequenceNumber string,
+		AccountNumber string,
+		BatchNumber string,
+		BatchSequenceNumber string,
+		CardTransactionFee string,
+		RecordType string,
+		ReponseCodeText string,
+		AuthorizationNumber string,
+		AuthorizationCode1 string,
+		AuthorizationCode2 string,
+		CustomerName string,
+		EntryType string,
+		ExpirationDate string,
+		AuthorizationTime string,
+		VehicleNumber string,
+		OdometerReading string,
+		DriverNumber string,
+		CustomizedReferenceNumber string,
+		AccountType string,
+		AuthorizationTraceId string,
+		AuthorizationPartyName string,
+		STTNumber string,
+		BalanceAmount string,
+		MaskedAccountNumber string,
+		RoutingNumber string,
+		CheckNumber string,
+		CardType string,
+		Amount string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"OwnerSequenceNumber","4"},
+			{"AccountNumber","40"},
+			{"BatchNumber","10"},
+			{"BatchSequenceNumber","10"},
+			{"CardTransactionFee","4"},
+			{"RecordType","6"},
+			{"ReponseCodeText","12"},
+			{"AuthorizationNumber","12"},
+			{"AuthorizationCode1","6"},
+			{"AuthorizationCode2","6"},
+			{"CustomerName","26"},
+			{"EntryType","10"},
+			{"ExpirationDate","4"},
+			{"AuthorizationTime","6"},
+			{"VehicleNumber","10"},
+			{"OdometerReading","10"},
+			{"DriverNumber","10"},
+			{"CustomizedReferenceNumber","14"},
+			{"AccountType","3"},
+			{"AuthorizationTraceId","6"},
+			{"AuthorizationPartyName","20"},
+			{"STTNumber","6"},
+			{"BalanceAmount","4"},
+			{"MaskedAccountNumber","40"},
+			{"RoutingNumber","9"},
+			{"CheckNumber","10"},
+			{"CardType","10"},
+			{"Amount","11"}
+		},
+		"139",
+		"D1"
+	);
+OUTPUT @bucket_D1_139
+TO @d1_139
+USING Outputters.Csv(outputHeader:true, quoting:false);

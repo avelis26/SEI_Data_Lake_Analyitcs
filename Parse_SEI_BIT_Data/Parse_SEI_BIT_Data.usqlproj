@@ -21,6 +21,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Script Include="D1_120.usql" />
+    <Script Include="D1_121.usql" />
+    <Script Include="D1_122.usql" />
+    <Script Include="D1_123.usql" />
+    <Script Include="D1_124.usql" />
+    <Script Include="D1_125.usql" />
+    <Script Include="D1_127.usql" />
+    <Script Include="D1_128.usql" />
+    <Script Include="D1_129.usql" />
+    <Script Include="D1_130.usql" />
+    <Script Include="D1_131.usql" />
+    <Script Include="D1_132.usql" />
+    <Script Include="D1_133.usql" />
+    <Script Include="D1_134.usql" />
+    <Script Include="D1_135.usql" />
+    <Script Include="D1_136.usql" />
+    <Script Include="D1_137.usql" />
+    <Script Include="D1_138.usql" />
+    <Script Include="D1_139.usql" />
+    <Script Include="D1_140.usql" />
+    <Script Include="D1_409.usql" />
+    <Script Include="D1_411.usql" />
+    <Script Include="D1_462.usql" />
+    <Script Include="D1_463.usql" />
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>

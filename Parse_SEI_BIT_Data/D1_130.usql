@@ -1,0 +1,78 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = "/BIT_CRM/20171128/{*}";
+DECLARE @d1_130 string = "/Parsed/d1_130_output.csv";
+@bucket_D1_130 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		RecordType string,
+		DispenserNumber string,
+		SaleProductId string,
+		HoseNumber string,
+		MediaNumber string,
+		ServiceLevelId string,
+		PricePerUnit string,
+		SaleVolume string,
+		CreePage string,
+		RecordAmount string,
+		FuelPriceTable string,
+		FuelPriceGroup string,
+		PrimaryTankNumber string,
+		PrimaryTankVolume string,
+		SecondaryTankNumber string,
+		SecondaryTankVolume string,
+		ManualFlag string,
+		AutoFinalFlag string,
+		DeviceType string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		PrepayFlag string,
+		MediaAdjustAmount string,
+		AdjustPricePerUnit string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"RecordType","6"},
+			{"DispenserNumber","6"},
+			{"SaleProductId","6"},
+			{"HoseNumber","6"},
+			{"MediaNumber","6"},
+			{"ServiceLevelId","6"},
+			{"PricePerUnit","11"},
+			{"SaleVolume","11"},
+			{"CreePage","11"},
+			{"RecordAmount","11"},
+			{"FuelPriceTable","6"},
+			{"FuelPriceGroup","6"},
+			{"PrimaryTankNumber","6"},
+			{"PrimaryTankVolume","11"},
+			{"SecondaryTankNumber","6"},
+			{"SecondaryTankVolume","11"},
+			{"ManualFlag","1"},
+			{"AutoFinalFlag","1"},
+			{"DeviceType","6"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"PrepayFlag","1"},
+			{"MediaAdjustAmount","11"},
+			{"AdjustPricePerUnit","11"}
+		},
+		"130",
+		"D1"
+	);
+OUTPUT @bucket_D1_130
+TO @d1_130
+USING Outputters.Csv(outputHeader:true, quoting:false);

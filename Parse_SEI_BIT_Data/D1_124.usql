@@ -1,0 +1,50 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = "/BIT_CRM/20171128/{*}";
+DECLARE @d1_124 string = "/Parsed/d1_124_output.csv";
+@bucket_D1_124 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		MediaNumber string,
+		NetworkMediaSequenceNumber string,
+		MediaType string,
+		RecordCount string,
+		RecordAmount string,
+		RecordType string,
+		ErrorCorrectionFlag string,
+		VoidFlag string,
+		ExchangeRate string,
+		ForeignAmount string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"MediaNumber","6"},
+			{"NetworkMediaSequenceNumber","11"},
+			{"MediaType","2"},
+			{"RecordCount","6"},
+			{"RecordAmount","11"},
+			{"RecordType","6"},
+			{"ErrorCorrectionFlag","1"},
+			{"VoidFlag","1"},
+			{"ExchangeRate","5"},
+			{"ForeignAmount","11"}
+		},
+		"124",
+		"D1"
+	);
+OUTPUT @bucket_D1_124
+TO @d1_124
+USING Outputters.Csv(outputHeader:true, quoting:false);

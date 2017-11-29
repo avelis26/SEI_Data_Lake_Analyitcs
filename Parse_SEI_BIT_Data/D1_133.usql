@@ -1,0 +1,66 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY Assemblies;
+DECLARE @in string = "/BIT_CRM/20171128/{*}";
+DECLARE @d1_133 string = "/Parsed/d1_133_output.csv";
+@bucket_D1_133 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		SequenceNumber string,
+		LoadSaleSequenceNumber string,
+		RecordType string,
+		LoadAmount string,
+		BalanceAmount string,
+		AccountNumber string,
+		STTNumber string,
+		AuthorizationTime string,
+		AuthorizationNumber string,
+		AuthorizationCode string,
+		NetworkTerminal string,
+		NetworkLocalTerminal string,
+		PLUNumber string,
+		ItemId string,
+		ItmCostAmount string,
+		VendorId string,
+		FeeAmount string,
+		FeeAmountEmbedded string,
+		FeeAmountVendor string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"SequenceNumber","11"},
+			{"LoadSaleSequenceNumber","11"},
+			{"RecordType","4"},
+			{"LoadAmount","6"},
+			{"BalanceAmount","6"},
+			{"AccountNumber","19"},
+			{"STTNumber","6"},
+			{"AuthorizationTime","6"},
+			{"AuthorizationNumber","12"},
+			{"AuthorizationCode","6"},
+			{"NetworkTerminal","12"},
+			{"NetworkLocalTerminal","2"},
+			{"PLUNumber","14"},
+			{"ItemId","11"},
+			{"ItmCostAmount","11"},
+			{"VendorId","11"},
+			{"FeeAmount","6"},
+			{"FeeAmountEmbedded","6"},
+			{"FeeAmountVendor","6"}
+		},
+		"133",
+		"D1"
+	);
+OUTPUT @bucket_D1_133
+TO @d1_133
+USING Outputters.Csv(outputHeader:true, quoting:false);
