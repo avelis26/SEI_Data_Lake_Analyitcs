@@ -1,7 +1,7 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY Assemblies;
-DECLARE @in string = new Constants.InputFileLocations.getInputFolderPath();
-DECLARE @d1_120 string = new Constants.OutputFileLocations.getD1_120path();
+DECLARE @in string = Constants.InputFileLocations.getInputFolderPath();
+DECLARE @d1_120 string = "/Parsed/d1_120_output.csv";
 @bucket_D1_120 =
 	EXTRACT
 		RecordId string,
