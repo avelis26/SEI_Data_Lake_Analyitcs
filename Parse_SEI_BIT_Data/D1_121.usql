@@ -1,7 +1,7 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-DECLARE CONST @in = FilePaths.Input.GetInputPath();
-DECLARE CONST @d1_121 = FilePaths.Output.GetD1121OutputPath()
+DECLARE @in string = "/BIT_CRM/bit_test_compressed/{*}";
+DECLARE @d1_121 string = "/BIT_CRM/Parsed/d1_121_output.csv";
 @bucket_D1_121 =
 	EXTRACT
 		RecordId string,

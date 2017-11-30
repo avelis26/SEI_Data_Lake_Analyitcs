@@ -1,7 +1,33 @@
 ﻿USE DATABASE [master];
-REFERENCE ASSEMBLY Assemblies;
-DECLARE @in string = "/BIT_CRM/bit_test_compressed/{*}";
-DECLARE @d1_120 string = "/BIT_CRM/bit_test_compressed/d1_120_output.csv";
+REFERENCE ASSEMBLY [Assemblies];
+DECLARE @datedFolder string = "20171128";
+DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
+DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
+DECLARE @d1_120 string = @outPathRoot + "d1_120_output.csv";
+DECLARE @d1_121 string = @outPathRoot + "d1_121_output.csv";
+DECLARE @d1_122 string = @outPathRoot + "d1_122_output.csv";
+DECLARE @d1_123 string = @outPathRoot + "d1_123_output.csv";
+DECLARE @d1_124 string = @outPathRoot + "d1_124_output.csv";
+DECLARE @d1_125 string = @outPathRoot + "d1_125_output.csv";
+DECLARE @d1_127 string = @outPathRoot + "d1_127_output.csv";
+DECLARE @d1_128 string = @outPathRoot + "d1_128_output.csv";
+DECLARE @d1_129 string = @outPathRoot + "d1_129_output.csv";
+DECLARE @d1_130 string = @outPathRoot + "d1_130_output.csv";
+DECLARE @d1_131 string = @outPathRoot + "d1_131_output.csv";
+DECLARE @d1_132 string = @outPathRoot + "d1_132_output.csv";
+DECLARE @d1_133 string = @outPathRoot + "d1_133_output.csv";
+DECLARE @d1_134 string = @outPathRoot + "d1_134_output.csv";
+DECLARE @d1_135 string = @outPathRoot + "d1_135_output.csv";
+DECLARE @d1_136 string = @outPathRoot + "d1_136_output.csv";
+DECLARE @d1_137 string = @outPathRoot + "d1_137_output.csv";
+DECLARE @d1_138 string = @outPathRoot + "d1_138_output.csv";
+DECLARE @d1_139 string = @outPathRoot + "d1_139_output.csv";
+DECLARE @d1_140 string = @outPathRoot + "d1_140_output.csv";
+DECLARE @d1_409 string = @outPathRoot + "d1_409_output.csv";
+DECLARE @d1_411 string = @outPathRoot + "d1_411_output.csv";
+DECLARE @d1_462 string = @outPathRoot + "d1_462_output.csv";
+DECLARE @d1_463 string = @outPathRoot + "d1_463_output.csv";
+
 @bucket_D1_120 =
 	EXTRACT
 		RecordId string,
@@ -52,7 +78,8 @@ DECLARE @d1_120 string = "/BIT_CRM/bit_test_compressed/d1_120_output.csv";
 OUTPUT @bucket_D1_120
 TO @d1_120
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_121 string = "/BIT_CRM/bit_test_compressed/d1_121_output.csv";
+
+
 @bucket_D1_121 =
 	EXTRACT
 		RecordId string,
@@ -103,7 +130,8 @@ DECLARE @d1_121 string = "/BIT_CRM/bit_test_compressed/d1_121_output.csv";
 OUTPUT @bucket_D1_121
 TO @d1_121
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_122 string = "/BIT_CRM/bit_test_compressed/d1_122_output.csv";
+
+
 @bucket_D1_122 =
 	EXTRACT
 		RecordID string,
@@ -160,7 +188,7 @@ DECLARE @d1_122 string = "/BIT_CRM/bit_test_compressed/d1_122_output.csv";
 			{"SalesPrice","4"},
 			{"MUBasePrice","4"},
 			{"HostItemId","14"},
-			{"CouponCount","10"}
+			{"CouponCount","2"}
 		},
 		"122",
 		"D1"
@@ -168,7 +196,8 @@ DECLARE @d1_122 string = "/BIT_CRM/bit_test_compressed/d1_122_output.csv";
 OUTPUT @bucket_D1_122
 TO @d1_122
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_123 string = "/BIT_CRM/bit_test_compressed/d1_123_output.csv";
+
+
 @bucket_D1_123 =
 	EXTRACT
 		RecordId string,
@@ -217,7 +246,8 @@ DECLARE @d1_123 string = "/BIT_CRM/bit_test_compressed/d1_123_output.csv";
 OUTPUT @bucket_D1_123
 TO @d1_123
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_124 string = "/BIT_CRM/bit_test_compressed/d1_124_output.csv";
+
+
 @bucket_D1_124 =
 	EXTRACT
 		RecordId string,
@@ -264,7 +294,8 @@ DECLARE @d1_124 string = "/BIT_CRM/bit_test_compressed/d1_124_output.csv";
 OUTPUT @bucket_D1_124
 TO @d1_124
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_125 string = "/BIT_CRM/bit_test_compressed/d1_125_output.csv";
+
+
 @bucket_D1_125 =
 	EXTRACT
 		RecordId string,
@@ -302,7 +333,8 @@ DECLARE @d1_125 string = "/BIT_CRM/bit_test_compressed/d1_125_output.csv";
 OUTPUT @bucket_D1_125
 TO @d1_125
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_127 string = "/BIT_CRM/bit_test_compressed/d1_127_output.csv";
+
+
 @bucket_D1_127 =
 	EXTRACT
 		RecordId string,
@@ -333,7 +365,8 @@ DECLARE @d1_127 string = "/BIT_CRM/bit_test_compressed/d1_127_output.csv";
 OUTPUT @bucket_D1_127
 TO @d1_127
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_128 string = "/BIT_CRM/bit_test_compressed/d1_128_output.csv";
+
+
 @bucket_D1_128 =
 	EXTRACT
 		RecordId string,
@@ -374,7 +407,8 @@ DECLARE @d1_128 string = "/BIT_CRM/bit_test_compressed/d1_128_output.csv";
 OUTPUT @bucket_D1_128
 TO @d1_128
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_129 string = "/BIT_CRM/bit_test_compressed/d1_129_output.csv";
+
+
 @bucket_D1_129 =
 	EXTRACT
 		RecordId string,
@@ -415,7 +449,8 @@ DECLARE @d1_129 string = "/BIT_CRM/bit_test_compressed/d1_129_output.csv";
 OUTPUT @bucket_D1_129
 TO @d1_129
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_130 string = "/BIT_CRM/bit_test_compressed/d1_130_output.csv";
+
+
 @bucket_D1_130 =
 	EXTRACT
 		RecordId string,
@@ -490,7 +525,8 @@ DECLARE @d1_130 string = "/BIT_CRM/bit_test_compressed/d1_130_output.csv";
 OUTPUT @bucket_D1_130
 TO @d1_130
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_131 string = "/BIT_CRM/bit_test_compressed/d1_131_output.csv";
+
+
 @bucket_D1_131 =
 	EXTRACT
 		RecordID string,
@@ -523,7 +559,8 @@ DECLARE @d1_131 string = "/BIT_CRM/bit_test_compressed/d1_131_output.csv";
 OUTPUT @bucket_D1_131
 TO @d1_131
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_132 string = "/BIT_CRM/bit_test_compressed/d1_132_output.csv";
+
+
 @bucket_D1_132 =
 	EXTRACT
 		RecordId string,
@@ -548,7 +585,8 @@ DECLARE @d1_132 string = "/BIT_CRM/bit_test_compressed/d1_132_output.csv";
 OUTPUT @bucket_D1_132
 TO @d1_132
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_133 string = "/BIT_CRM/bit_test_compressed/d1_133_output.csv";
+
+
 @bucket_D1_133 =
 	EXTRACT
 		RecordId string,
@@ -611,7 +649,8 @@ DECLARE @d1_133 string = "/BIT_CRM/bit_test_compressed/d1_133_output.csv";
 OUTPUT @bucket_D1_133
 TO @d1_133
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_134 string = "/BIT_CRM/bit_test_compressed/d1_134_output.csv";
+
+
 @bucket_D1_134 =
 	EXTRACT
 		RecordId string,
@@ -656,7 +695,8 @@ DECLARE @d1_134 string = "/BIT_CRM/bit_test_compressed/d1_134_output.csv";
 OUTPUT @bucket_D1_134
 TO @d1_134
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_135 string = "/BIT_CRM/bit_test_compressed/d1_135_output.csv";
+
+
 @bucket_D1_135 =
 	EXTRACT
 		RecordId string,
@@ -709,7 +749,7 @@ DECLARE @d1_135 string = "/BIT_CRM/bit_test_compressed/d1_135_output.csv";
 			{"IsNetworkEOD","1"},
 			{"IsAcceptEOD","1"},
 			{"TerminalType","5"},
-			{"AlarmDropAmount","6"}
+			{"AlarmDropAmount","5"}
 		},
 		"135",
 		"D1"
@@ -717,7 +757,8 @@ DECLARE @d1_135 string = "/BIT_CRM/bit_test_compressed/d1_135_output.csv";
 OUTPUT @bucket_D1_135
 TO @d1_135
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_136 string = "/BIT_CRM/bit_test_compressed/d1_136_output.csv";
+
+
 @bucket_D1_136 =
 	EXTRACT
 		RecordId string,
@@ -764,7 +805,8 @@ DECLARE @d1_136 string = "/BIT_CRM/bit_test_compressed/d1_136_output.csv";
 OUTPUT @bucket_D1_136
 TO @d1_136
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_137 string = "/BIT_CRM/bit_test_compressed/d1_137_output.csv";
+
+
 @bucket_D1_137 =
 	EXTRACT
 		RecordId string,
@@ -803,7 +845,8 @@ DECLARE @d1_137 string = "/BIT_CRM/bit_test_compressed/d1_137_output.csv";
 OUTPUT @bucket_D1_137
 TO @d1_137
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_138 string = "/BIT_CRM/bit_test_compressed/d1_138_output.csv";
+
+
 @bucket_D1_138 =
 	EXTRACT
 		RecordId string,
@@ -844,7 +887,8 @@ DECLARE @d1_138 string = "/BIT_CRM/bit_test_compressed/d1_138_output.csv";
 OUTPUT @bucket_D1_138
 TO @d1_138
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_139 string = "/BIT_CRM/bit_test_compressed/d1_139_output.csv";
+
+
 @bucket_D1_139 =
 	EXTRACT
 		RecordId string,
@@ -927,7 +971,8 @@ DECLARE @d1_139 string = "/BIT_CRM/bit_test_compressed/d1_139_output.csv";
 OUTPUT @bucket_D1_139
 TO @d1_139
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_140 string = "/BIT_CRM/bit_test_compressed/d1_140_output.csv";
+
+
 @bucket_D1_140 =
 	EXTRACT
 		RecordId string,
@@ -966,7 +1011,8 @@ DECLARE @d1_140 string = "/BIT_CRM/bit_test_compressed/d1_140_output.csv";
 OUTPUT @bucket_D1_140
 TO @d1_140
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_409 string = "/BIT_CRM/bit_test_compressed/d1_409_output.csv";
+
+
 @bucket_D1_409 =
 	EXTRACT
 		RecordId string,
@@ -1067,7 +1113,8 @@ DECLARE @d1_409 string = "/BIT_CRM/bit_test_compressed/d1_409_output.csv";
 OUTPUT @bucket_D1_409
 TO @d1_409
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_411 string = "/BIT_CRM/bit_test_compressed/d1_411_output.csv";
+
+
 @bucket_D1_411 =
 	EXTRACT
 		RecordId string,
@@ -1110,7 +1157,8 @@ DECLARE @d1_411 string = "/BIT_CRM/bit_test_compressed/d1_411_output.csv";
 OUTPUT @bucket_D1_411
 TO @d1_411
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_462 string = "/BIT_CRM/bit_test_compressed/d1_462_output.csv";
+
+
 @bucket_D1_462 =
 	EXTRACT
 		RecordId string,
@@ -1151,7 +1199,8 @@ DECLARE @d1_462 string = "/BIT_CRM/bit_test_compressed/d1_462_output.csv";
 OUTPUT @bucket_D1_462
 TO @d1_462
 USING Outputters.Csv(outputHeader:true, quoting:false);
-DECLARE @d1_463 string = "/BIT_CRM/bit_test_compressed/d1_463_output.csv";
+
+
 @bucket_D1_463 =
 	EXTRACT
 		RecordId string,

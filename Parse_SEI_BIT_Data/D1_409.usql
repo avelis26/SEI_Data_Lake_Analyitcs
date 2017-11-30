@@ -1,7 +1,7 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY Assemblies;
-DECLARE @in string = "/BIT_CRM/20171128/{*}";
-DECLARE @d1_409 string = "/Parsed/d1_409_output.csv";
+DECLARE @in string = "/BIT_CRM/bit_test_compressed/{*}";
+DECLARE @d1_409 string = "/BIT_CRM/Parsed/d1_409_output.csv";
 @bucket_D1_409 =
 	EXTRACT
 		RecordId string,
