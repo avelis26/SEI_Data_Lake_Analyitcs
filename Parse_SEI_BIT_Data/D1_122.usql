@@ -1,7 +1,9 @@
 ﻿USE DATABASE [master];
-REFERENCE ASSEMBLY Assemblies;
-DECLARE @in string = "/BIT_CRM/bit_test_compressed/{*}";
-DECLARE @d1_122 string = "/BIT_CRM/Parsed/d1_122_output.csv";
+REFERENCE ASSEMBLY [Assemblies];
+DECLARE @datedFolder string = "20171116";
+DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
+DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
+DECLARE @d1_122 string = @outPathRoot + "d1_122_output.csv";
 @bucket_D1_122 =
 	EXTRACT
 		RecordID string,
