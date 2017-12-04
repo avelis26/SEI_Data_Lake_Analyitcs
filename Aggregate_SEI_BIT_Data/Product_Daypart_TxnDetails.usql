@@ -1,0 +1,158 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY [Assemblies];
+/*
+CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
+FROM AZURESQLDB
+WITH
+(
+    PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
+    CREDENTIAL = MyAzureSQLDBCredential,
+    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+);
+*/
+DECLARE @datedFolder string = "20171129";
+DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
+DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
+DECLARE @productIn string = "/BIT_CRM/productTable.csv";
+DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
+DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
+@headerTable =
+    EXTRACT TransactionType int,
+            Aborted string,
+            DeviceType int,
+            EmployeeNumber int,
+            DayNumber int,
+            TotalAmount int,
+            StartTime int,
+            EndTime int,
+            TransactionCode int,
+            TransactionSequence int,
+            RecordId string,
+            StoreNumber int,
+            RewardMemberID string,
+            ShiftNumber int,
+            DeviceNumber int,
+            EndDate int,
+            TransactionUID int,
+            Status int,
+            StartDate int
+    FROM @headerIn
+    USING Extractors.Csv(skipFirstNRows : 1);
+
+
+@detailsTable =
+    EXTRACT PromotionCount int,
+            HostItemId string,
+            CarryStatus int,
+            TaxOverideFlag string,
+            RecommendedFlag string,
+            TaxableFlag string,
+            PLUNumber string,
+            ShiftNumber int,
+            DayNumber int,
+            PriceMultiple int,
+            RecordAmount int,
+            SizeIndx int,
+            PriceOverideFlag string,
+            SalesPrice int,
+            MUBasePrice int,
+            RecordCount int,
+            StoreNumber int,
+            ProductNumber int,
+            SequenceNumber int,
+            RecordID string,
+            TransactionUID int,
+            ErrorCorrectionFlag string,
+            RecordType int,
+            VoidFlag string,
+            TransactionType int,
+            CouponCoun int
+    FROM @detailsIn
+    USING Extractors.Csv(skipFirstNRows : 1);
+
+
+@productTable =
+    EXTRACT ProductMaster_Id int,
+            slin int,
+            upc string,
+            Category_Cd string,
+            Category_Ds string,
+            Depart_Cd int,
+            Manufacturer_Cd string,
+            Manufacturer_Nm string,
+            PSA_Cd string,
+            PSA_Ds string,
+            Item_Ds string,
+            SubCategory_Cd int,
+            SubCategory_Ds string,
+            VerticalClass_Cd string,
+            VerticalClass_Ds string,
+            CorpBrand string,
+            UPCType_Cd string,
+            AgeRestricted_Fg string,
+            CurrentImport_Id string,
+            OriginalImport_Id string,
+            Modified_Dttm string,
+            Created_Dttm string
+    FROM @productIn
+    USING Extractors.Csv(skipFirstNRows : 1, silent : true);
+
+
+//Making the header table data unique as there are duplicate records
+@header_1 =
+    SELECT X. *,
+           X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
+    FROM @headerTable AS X;
+
+
+@detailsTable_1 =
+    SELECT DISTINCT X. *,
+                    InsightReportingUSQL.StringModifier.remLeadingZero(X.PLUNumber) AS String_PLU
+    FROM @detailsTable AS X;
+
+
+@result_1 =
+    SELECT X.EndDate,
+           X.StoreNumber,
+           p.PSA_Cd,
+           p.PSA_Ds,
+           p.Category_Cd,
+           p.Category_Ds,
+           RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
+           COUNT(DISTINCT X.EndTime BETWEEN 000000 AND 060000? Uniq_Id : NULL) AS Txn_Cnt_DayP1,
+           COUNT(DISTINCT X.EndTime BETWEEN 060001 AND 090000? Uniq_Id : NULL) AS Txn_Cnt_DayP2,
+           COUNT(DISTINCT X.EndTime BETWEEN 090001 AND 110000? Uniq_Id : NULL) AS Txn_Cnt_DayP3,
+           COUNT(DISTINCT X.EndTime BETWEEN 110001 AND 140000? Uniq_Id : NULL) AS Txn_Cnt_DayP4,
+           COUNT(DISTINCT X.EndTime BETWEEN 140001 AND 160000? Uniq_Id : NULL) AS Txn_Cnt_DayP5,
+           COUNT(DISTINCT X.EndTime BETWEEN 160001 AND 190000? Uniq_Id : NULL) AS Txn_Cnt_DayP6,
+           COUNT(DISTINCT X.EndTime BETWEEN 190001 AND 235959? Uniq_Id : NULL) AS Txn_Cnt_DayP7,
+           SUM(X.EndTime BETWEEN 000000 AND 060000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? RecordAmount / 100f : 0) AS Ttl_Amt_DayP7
+    FROM @header_1 AS X
+         INNER JOIN
+             @detailsTable_1 AS DT1
+         ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
+         //AND X.TransactionSequence==DT1.SequenceNumber
+         INNER JOIN
+             @productTable AS p
+         ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU
+
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18) //AND TransactionCode==3  
+          AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
+    GROUP BY X.EndDate,
+             X.StoreNumber,
+             p.PSA_Cd,
+             p.PSA_Ds,
+             p.Category_Cd,
+             p.Category_Ds,
+             RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member";
+
+
+OUTPUT @result_1
+TO @productDaypartOut
+USING Outputters.Csv(outputHeader : true);

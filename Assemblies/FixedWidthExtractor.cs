@@ -40,3 +40,11 @@ namespace MyCustomExtractors {
 		}
 	}
 }
+namespace InsightReportingUSQL {
+	public class StringModifier {
+		public static string remLeadingZero(string inputString) {
+			ulong cleanString = ulong.Parse(inputString);
+			return cleanString.ToString();
+		}
+	}
+}

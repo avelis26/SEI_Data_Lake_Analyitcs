@@ -10,6 +10,8 @@ Project("{182E2583-ECAD-465B-BB50-91101D7C24CE}") = "Parse_SEI_BIT_Data", "Parse
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assemblies", "Assemblies\Assemblies.csproj", "{2D228D63-0E6B-4006-802A-53FFDE5B408B}"
 EndProject
+Project("{182E2583-ECAD-465B-BB50-91101D7C24CE}") = "Aggregate_SEI_BIT_Data", "Aggregate_SEI_BIT_Data\Aggregate_SEI_BIT_Data.usqlproj", "{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,18 @@ Global
 		{2D228D63-0E6B-4006-802A-53FFDE5B408B}.Release|x64.Build.0 = Release|Any CPU
 		{2D228D63-0E6B-4006-802A-53FFDE5B408B}.Release|x86.ActiveCfg = Release|Any CPU
 		{2D228D63-0E6B-4006-802A-53FFDE5B408B}.Release|x86.Build.0 = Release|Any CPU
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Debug|x64.ActiveCfg = Debug|x64
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Debug|x64.Build.0 = Debug|x64
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Debug|x86.ActiveCfg = Debug|x86
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Debug|x86.Build.0 = Debug|x86
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Release|x64.ActiveCfg = Release|x64
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Release|x64.Build.0 = Release|x64
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Release|x86.ActiveCfg = Release|x86
+		{3FDC49F3-C0FD-4C29-BDB4-C2D524E23085}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
