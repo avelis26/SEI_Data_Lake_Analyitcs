@@ -1,6 +1,6 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-DECLARE @datedFolder string = "20171111";
+DECLARE @datedFolder string = "20171127";
 DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
 DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
 DECLARE @d1_124 string = @outPathRoot + @datedFolder + "_" + "d1_124_output.csv";
