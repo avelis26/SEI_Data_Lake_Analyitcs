@@ -1,1 +1,181 @@
-﻿
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY [Assemblies];
+/*
+CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
+FROM AZURESQLDB
+WITH
+(
+    PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
+    CREDENTIAL = MyAzureSQLDBCredential,
+    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+);
+*/
+DECLARE @datedFolder string = "20171129";
+DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
+DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
+DECLARE @mediaIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
+DECLARE @productIn string = "/BIT_CRM/productTable.csv";
+DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
+DECLARE @tenderTypeOut string = @outPathRoot + @datedFolder + "_TenderTypes_Txns.csv";
+
+
+@headerTable =
+    EXTRACT TransactionType int,
+            Aborted string,
+            DeviceType int,
+            EmployeeNumber int,
+            DayNumber int,
+            TotalAmount int,
+            StartTime int,
+            EndTime int,
+            TransactionCode int,
+            TransactionSequence int,
+            RecordId string,
+            StoreNumber int,
+            RewardMemberID string,
+            ShiftNumber int,
+            DeviceNumber int,
+            EndDate int,
+            TransactionUID int,
+            Status int,
+            StartDate int
+    FROM @headerIn
+    USING Extractors.Csv(skipFirstNRows : 1);
+
+
+@detailsTable =
+    EXTRACT PromotionCount int,
+            HostItemId string,
+            CarryStatus int,
+            TaxOverideFlag string,
+            RecommendedFlag string,
+            TaxableFlag string,
+            PLUNumber string,
+            ShiftNumber int,
+            DayNumber int,
+            PriceMultiple int,
+            RecordAmount int,
+            SizeIndx int,
+            PriceOverideFlag string,
+            SalesPrice int,
+            MUBasePrice int,
+            RecordCount int,
+            StoreNumber int,
+            ProductNumber int,
+            SequenceNumber int,
+            RecordID string,
+            TransactionUID int,
+            ErrorCorrectionFlag string,
+            RecordType int,
+            VoidFlag string,
+            TransactionType int,
+            CouponCoun int
+    FROM @detailsIn
+    USING Extractors.Csv(skipFirstNRows : 1);
+
+
+@mediaTable =
+    EXTRACT MediaType string,
+            DayNumber int,
+            VoidFlag string,
+            TransactionType int,
+            MediaNumber int,
+            NetworkMediaSequenceNumber int,
+            RecordAmount int,
+            RecordType int,
+            ExchangeRate int,
+            ErrorCorrectionFlag string,
+            StoreNumber int,
+            ForeignAmount int,
+            TransactionUID int,
+            RecordId string,
+            RecordCount int,
+            ShiftNumber int,
+            SequenceNumber int
+    FROM @mediaIn
+    USING Extractors.Csv(skipFirstNRows : 1);
+
+
+@productTable =
+    EXTRACT ProductMaster_Id int,
+            slin int,
+            upc string,
+            Category_Cd string,
+            Category_Ds string,
+            Depart_Cd int,
+            Manufacturer_Cd string,
+            Manufacturer_Nm string,
+            PSA_Cd string,
+            PSA_Ds string,
+            Item_Ds string,
+            SubCategory_Cd int,
+            SubCategory_Ds string,
+            VerticalClass_Cd string,
+            VerticalClass_Ds string,
+            CorpBrand string,
+            UPCType_Cd string,
+            AgeRestricted_Fg string,
+            CurrentImport_Id string,
+            OriginalImport_Id string,
+            Modified_Dttm string,
+            Created_Dttm string
+    FROM @productIn
+    USING Extractors.Csv(skipFirstNRows : 1, silent : true);
+
+
+//Department table is already unique on the 4 keys but still deduping it
+@header_1 =
+    SELECT X. *,
+           X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
+    FROM @headerTable AS X;
+
+
+@detailsTable_1 =
+    SELECT DISTINCT *,
+                    InsightReportingUSQL.StringModifier.remLeadingZero(X.PLUNumber) AS String_PLU
+    FROM @detailsTable AS X;
+
+
+@mediaSales_1 =
+    SELECT DISTINCT *
+    FROM @mediaTable;
+
+
+@result =
+    SELECT X.EndDate AS EndDate,
+           X.StoreNumber,
+           RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
+           MediaType == "CS"?"CASH" :
+           MediaType == "CR"? "CREDIT" :
+           MediaType == "DB"? "DEBIT" :
+           MediaType == "FL"? "FLEET CARD" :
+           MediaType == "SV"? "SERVICE CARD" :
+           "Unknown" AS Media_Type,
+           COUNT(DISTINCT X.Uniq_Id) AS Txn_Cnt,
+           SUM(DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount
+    FROM @header_1 AS X
+         INNER JOIN
+             @detailsTable_1 AS DT1
+         ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
+         INNER JOIN
+             @mediaSales_1 AS MS1
+         ON X.DayNumber == MS1.DayNumber AND X.StoreNumber == MS1.StoreNumber AND X.ShiftNumber == MS1.ShiftNumber AND X.TransactionUID == MS1.TransactionUID
+         INNER JOIN
+             @productTable AS p
+         ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18) //AND TransactionCode==3  
+          AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
+    GROUP BY X.EndDate,
+             X.StoreNumber,
+             RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member",
+             MediaType == "CS"?"CASH" :
+             MediaType == "CR"? "CREDIT" :
+             MediaType == "DB"? "DEBIT" :
+             MediaType == "FL"? "FLEET CARD" :
+             MediaType == "SV"? "SERVICE CARD" :
+             "Unknown";
+
+
+OUTPUT @result
+TO @tenderTypeOut
+USING Outputters.Csv(outputHeader : true);

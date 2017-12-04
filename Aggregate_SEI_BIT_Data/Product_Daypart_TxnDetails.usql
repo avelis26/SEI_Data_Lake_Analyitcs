@@ -16,6 +16,8 @@ DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_
 DECLARE @productIn string = "/BIT_CRM/productTable.csv";
 DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
 DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
+
+
 @headerTable =
     EXTRACT TransactionType int,
             Aborted string,
@@ -83,7 +85,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             PSA_Cd string,
             PSA_Ds string,
             Item_Ds string,
-            SubCategory_Cd int,
+            SubCategory_Cd string,
             SubCategory_Ds string,
             VerticalClass_Cd string,
             VerticalClass_Ds string,
@@ -111,7 +113,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     FROM @detailsTable AS X;
 
 
-@result_1 =
+@result =
     SELECT X.EndDate,
            X.StoreNumber,
            p.PSA_Cd,
@@ -153,6 +155,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
              RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member";
 
 
-OUTPUT @result_1
+OUTPUT @result
 TO @productDaypartOut
 USING Outputters.Csv(outputHeader : true);
