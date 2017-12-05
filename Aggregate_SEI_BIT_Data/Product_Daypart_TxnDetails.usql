@@ -16,7 +16,6 @@ DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
 DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
 DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
-
 /*
 DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
