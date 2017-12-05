@@ -23,6 +23,7 @@
     <Script Include="Product_Daypart_TxnDetails.usql" />
     <Script Include="Store_Item_Txn_TotalAmt.usql" />
     <Script Include="TenderTypes_Txns.usql" />
+    <Script Include="test.usql" />
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>

@@ -10,90 +10,90 @@ WITH
     REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
 */
-DECLARE @datedFolder string = "20171129";
-DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
-DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @mediaIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
-DECLARE @productIn string = "/BIT_CRM/productTable.csv";
-DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
+DECLARE @datedFolder string = "20171023";
+DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
+DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
+DECLARE @mediaIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
+DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
+DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
 DECLARE @tenderTypeOut string = @outPathRoot + @datedFolder + "_TenderTypes_Txns.csv";
 
 
 @headerTable =
-    EXTRACT TransactionType int,
+    EXTRACT RecordId string,
+            StoreNumber string,
+            TransactionType string,
+            DayNumber string,
+            ShiftNumber string,
+            TransactionUID string,
             Aborted string,
-            DeviceType int,
-            EmployeeNumber int,
-            DayNumber int,
-            TotalAmount int,
-            StartTime int,
-            EndTime int,
-            TransactionCode int,
-            TransactionSequence int,
-            RecordId string,
-            StoreNumber int,
-            RewardMemberID string,
-            ShiftNumber int,
-            DeviceNumber int,
-            EndDate int,
-            TransactionUID int,
-            Status int,
-            StartDate int
+            DeviceNumber string,
+            DeviceType string,
+            EmployeeNumber string,
+            EndDate string,
+            EndTime string,
+            StartDate string,
+            StartTime string,
+            Status string,
+            TotalAmount string,
+            TransactionCode string,
+            TransactionSequence string,
+            RewardMemberID string
     FROM @headerIn
-    USING Extractors.Csv(skipFirstNRows : 1);
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 
 @detailsTable =
-    EXTRACT PromotionCount int,
-            HostItemId string,
-            CarryStatus int,
-            TaxOverideFlag string,
-            RecommendedFlag string,
-            TaxableFlag string,
-            PLUNumber string,
-            ShiftNumber int,
-            DayNumber int,
-            PriceMultiple int,
-            RecordAmount int,
-            SizeIndx int,
-            PriceOverideFlag string,
-            SalesPrice int,
-            MUBasePrice int,
-            RecordCount int,
-            StoreNumber int,
-            ProductNumber int,
+    EXTRACT RecordID string,
+            StoreNumber string,
+            TransactionType string,
+            DayNumber string,
+            ShiftNumber string,
+            TransactionUID string,
             SequenceNumber int,
-            RecordID string,
-            TransactionUID int,
-            ErrorCorrectionFlag string,
+            ProductNumber int,
+            PLUNumber string,
+            RecordAmount int,
+            RecordCount string,
             RecordType int,
+            SizeIndx string,
+            ErrorCorrectionFlag string,
+            PriceOverideFlag string,
+            TaxableFlag string,
             VoidFlag string,
-            TransactionType int,
-            CouponCoun int
+            RecommendedFlag string,
+            PriceMultiple string,
+            CarryStatus string,
+            TaxOverideFlag string,
+            PromotionCount string,
+            SalesPrice string,
+            MUBasePrice string,
+            HostItemId string,
+            CouponCount string
     FROM @detailsIn
-    USING Extractors.Csv(skipFirstNRows : 1);
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 
 @mediaTable =
-    EXTRACT MediaType string,
-            DayNumber int,
-            VoidFlag string,
-            TransactionType int,
-            MediaNumber int,
-            NetworkMediaSequenceNumber int,
+    EXTRACT RecordId string,
+            StoreNumber string,
+            TransactionType string,
+            DayNumber string,
+            ShiftNumber string,
+            TransactionUID string,
+            SequenceNumber string,
+            MediaNumber string,
+            NetworkMediaSequenceNumber string,
+            MediaType string,
+            RecordCount string,
             RecordAmount int,
             RecordType int,
-            ExchangeRate int,
             ErrorCorrectionFlag string,
-            StoreNumber int,
-            ForeignAmount int,
-            TransactionUID int,
-            RecordId string,
-            RecordCount int,
-            ShiftNumber int,
-            SequenceNumber int
+            VoidFlag string,
+            ExchangeRate string,
+            ForeignAmount string
     FROM @mediaIn
-    USING Extractors.Csv(skipFirstNRows : 1);
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 
 @productTable =
@@ -108,7 +108,7 @@ DECLARE @tenderTypeOut string = @outPathRoot + @datedFolder + "_TenderTypes_Txns
             PSA_Cd string,
             PSA_Ds string,
             Item_Ds string,
-            SubCategory_Cd int,
+            SubCategory_Cd string,
             SubCategory_Ds string,
             VerticalClass_Cd string,
             VerticalClass_Ds string,
@@ -120,7 +120,7 @@ DECLARE @tenderTypeOut string = @outPathRoot + @datedFolder + "_TenderTypes_Txns
             Modified_Dttm string,
             Created_Dttm string
     FROM @productIn
-    USING Extractors.Csv(skipFirstNRows : 1, silent : true);
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 
 //Department table is already unique on the 4 keys but still deduping it
@@ -178,4 +178,4 @@ DECLARE @tenderTypeOut string = @outPathRoot + @datedFolder + "_TenderTypes_Txns
 
 OUTPUT @result
 TO @tenderTypeOut
-USING Outputters.Csv(outputHeader : true);
+USING Outputters.Csv(outputHeader : true, quoting : false);

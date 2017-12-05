@@ -1,0 +1,19 @@
+﻿USE DATABASE [master];
+
+CREATE DATA SOURCE IF NOT EXISTS [7ELE_dbo_TRNS_ProductMaster]
+FROM AZURESQLDB
+WITH
+(
+    PROVIDER_STRING = "Database=7ELE;Trusted_Connection=False;Encrypt=True",
+    CREDENTIAL = gpink003,
+    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+);
+DECLARE @outputFile string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable-FromSql.csv";
+@productTable =
+    SELECT *
+    FROM EXTERNAL [7ELE_dbo_TRNS_ProductMaster]
+	LOCATION "dbo.TRNS_ProductMaster";
+
+OUTPUT @productTable
+TO @outputFile
+USING Outputters.Csv(outputHeader : true, quoting : false);
