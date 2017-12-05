@@ -115,7 +115,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 
 @detailsTable_1 =
     SELECT DISTINCT *,
-                    InsightReportingUSQL.StringModifier.remLeadingZero(PLUNumber) AS String_PLU
+                    InsightReportingUSQL.StringModifier.RemLeadingZero(PLUNumber) AS String_PLU
     FROM @detailsTable;
 
 
