@@ -10,7 +10,7 @@ WITH
 	REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
 */
-DECLARE @datedFolder string = "20171023";
+DECLARE @datedFolder string = "20171112";
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";

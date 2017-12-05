@@ -1,8 +1,10 @@
 ﻿using Microsoft.Analytics.Interfaces;
 using Microsoft.Analytics.Types.Sql;
 using System.Collections.Generic;
+using System;
 using System.IO;
 using System.Text;
+using System.Linq;
 
 namespace MyCustomExtractors {
 	[SqlUserDefinedExtractor(AtomicFileProcessing = false)]
@@ -42,9 +44,10 @@ namespace MyCustomExtractors {
 }
 namespace InsightReportingUSQL {
 	public class StringModifier {
-		public static string remLeadingZero(string inputString) {
-			ulong cleanString = ulong.Parse(inputString);
-			return cleanString.ToString();
+		public static string RemLeadingZero(string inputString) {
+			ulong test1 = ulong.Parse(inputString);
+			string alphanumbericOnly = String.Concat(test1.ToString().Where(ch => Char.IsLetterOrDigit(ch)));
+			return alphanumbericOnly;
 		}
 	}
 }
