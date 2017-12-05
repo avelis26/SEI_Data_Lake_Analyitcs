@@ -46,7 +46,7 @@ namespace InsightReportingUSQL {
 	public class StringModifier {
 		public static string RemLeadingZero(string inputString) {
 			string alphanumbericOnly = String.Concat(inputString.ToString().Where(ch => Char.IsLetterOrDigit(ch)));
-			return alphanumbericOnly.TrimStart('0');
+			return string.IsNullOrEmpty(alphanumbericOnly.TrimStart('0')) ? "0" : alphanumbericOnly.TrimStart('0');
 		}
 	}
 }
