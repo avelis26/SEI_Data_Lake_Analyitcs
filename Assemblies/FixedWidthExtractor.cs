@@ -45,9 +45,8 @@ namespace MyCustomExtractors {
 namespace InsightReportingUSQL {
 	public class StringModifier {
 		public static string RemLeadingZero(string inputString) {
-			ulong test1 = ulong.Parse(inputString);
-			string alphanumbericOnly = String.Concat(test1.ToString().Where(ch => Char.IsLetterOrDigit(ch)));
-			return alphanumbericOnly;
+			string alphanumbericOnly = String.Concat(inputString.ToString().Where(ch => Char.IsLetterOrDigit(ch)));
+			return alpahnumbericOnly.TrimStart('0');
 		}
 	}
 }
