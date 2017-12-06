@@ -20,7 +20,6 @@
     <OutputPath>bin\Release\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Script Include="All.usql" />
     <Script Include="D1_120.usql" />
     <Script Include="D1_121.usql" />
     <Script Include="D1_122.usql" />
