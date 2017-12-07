@@ -10,15 +10,11 @@ WITH
 	REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
 */
-DECLARE @datedFolder string = "20171023";
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
-DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
 DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
-DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
-DECLARE @outputFile_1 string = @outPathRoot + "Unique_Member_Scans" + "_Product_Daypart_TxnDetails.csv";
-DECLARE @outputFile_2 string = @outPathRoot + "Unique_Member_Scans" + "_Product_Daypart_TxnDetails.csv";
+DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/";
+DECLARE @outputFile_1 string = @outPathRoot + "Unique_Member_Scans_10-23_to_11-22-2017/" + "Unique_Member_Scans_MARKET.csv";
+DECLARE @outputFile_2 string = @outPathRoot + "Unique_Member_Scans_10-23_to_11-22-2017/" + "Unique_Member_Scans_STORE.csv";
 /*
 DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
@@ -47,7 +43,37 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             TransactionCode string,
             TransactionSequence string,
             RewardMemberID string
-    FROM @headerIn
+    FROM "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171023/20171023_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171024/20171024_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171025/20171025_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171026/20171026_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171027/20171027_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171028/20171028_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171029/20171029_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171030/20171030_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171031/20171031_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171101/20171101_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171102/20171102_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171103/20171103_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171104/20171104_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171105/20171105_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171106/20171106_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171107/20171107_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171108/20171108_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171109/20171109_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171110/20171110_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171111/20171111_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171112/20171112_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171113/20171113_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171114/20171114_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171115/20171115_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171116/20171116_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171117/20171117_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171118/20171118_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171119/20171119_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171120/20171120_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171121/20171121_d1_121_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171122/20171122_d1_121_output.csv"
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 @detailsTable =
@@ -77,7 +103,37 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             MUBasePrice string,
             HostItemId string,
             CouponCount string
-    FROM @detailsIn
+    FROM "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171023/20171023_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171024/20171024_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171025/20171025_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171026/20171026_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171027/20171027_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171028/20171028_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171029/20171029_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171030/20171030_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171031/20171031_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171101/20171101_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171102/20171102_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171103/20171103_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171104/20171104_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171105/20171105_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171106/20171106_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171107/20171107_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171108/20171108_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171109/20171109_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171110/20171110_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171111/20171111_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171112/20171112_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171113/20171113_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171114/20171114_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171115/20171115_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171116/20171116_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171117/20171117_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171118/20171118_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171119/20171119_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171120/20171120_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171121/20171121_d1_122_output.csv",
+         "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/20171122/20171122_d1_122_output.csv"
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 @productTable =

@@ -26,10 +26,5 @@
     <Script Include="test.usql" />
     <Script Include="Unique_member_scans.usql" />
   </ItemGroup>
-  <ItemGroup>
-    <ScriptCode Include="Unique_member_scans.usql.cs">
-      <DependentUpon>Unique_member_scans.usql</DependentUpon>
-    </ScriptCode>
-  </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>
