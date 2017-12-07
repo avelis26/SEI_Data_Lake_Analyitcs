@@ -29,7 +29,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 */
 @headerTable =
     EXTRACT RecordId string,
-            StoreNumber string,
+            StoreNumber int,
             TransactionType string,
             DayNumber string,
             ShiftNumber string,
@@ -52,7 +52,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 
 @detailsTable =
     EXTRACT RecordID string,
-            StoreNumber string,
+            StoreNumber int,
             TransactionType string,
             DayNumber string,
             ShiftNumber string,
@@ -121,7 +121,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 
 @mediaTable =
     EXTRACT RecordId string,
-            StoreNumber string,
+            StoreNumber int,
             TransactionType string,
             DayNumber string,
             ShiftNumber string,
