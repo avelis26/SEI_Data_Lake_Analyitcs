@@ -5,18 +5,19 @@ CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
 FROM AZURESQLDB
 WITH
 (
-PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
-CREDENTIAL = MyAzureSQLDBCredential,
-REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+	PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
+	CREDENTIAL = MyAzureSQLDBCredential,
+	REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
 */
 DECLARE @datedFolder string = "20171023";
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
 DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
 DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
-DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Store_Item_Txn_TotalAmt.csv";
+DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Store_Item_Txn_TotalAmt.csv";
 /*
 DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
@@ -194,5 +195,5 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     ) AS X;
 
 OUTPUT @result
-TO @productDaypartOut
+TO @outputFile
 USING Outputters.Csv(outputHeader : true, quoting : false);

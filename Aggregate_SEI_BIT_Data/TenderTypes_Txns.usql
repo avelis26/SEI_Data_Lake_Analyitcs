@@ -11,12 +11,14 @@ WITH
 );
 */
 DECLARE @datedFolder string = "20171112";
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @mediaIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
+DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
+DECLARE @mediaIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
 DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
-DECLARE @tenderTypeOut string = @outPathRoot + @datedFolder + "_TenderTypes_Txns.csv";
+DECLARE @outputFile string = @outPathRoot + @datedFolder + "_TenderTypes_Txns.csv";
 /*
 DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
@@ -48,7 +50,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     FROM @headerIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
-
 @detailsTable =
     EXTRACT RecordID string,
             StoreNumber string,
@@ -79,29 +80,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     FROM @detailsIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
-
-@mediaTable =
-    EXTRACT RecordId string,
-            StoreNumber string,
-            TransactionType string,
-            DayNumber string,
-            ShiftNumber string,
-            TransactionUID string,
-            SequenceNumber string,
-            MediaNumber string,
-            NetworkMediaSequenceNumber string,
-            MediaType string,
-            RecordCount string,
-            RecordAmount int,
-            RecordType int,
-            ErrorCorrectionFlag string,
-            VoidFlag string,
-            ExchangeRate string,
-            ForeignAmount string
-    FROM @mediaIn
-    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
-
 @productTable =
     EXTRACT ProductMaster_Id int,
             slin int,
@@ -128,24 +106,83 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     FROM @productIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
+@storeTable =
+    EXTRACT Store_Id int,
+            Zone_Cd string,
+            Active_Fg int,
+            Dark_Fg int,
+            Owner_Cd string,
+            Zone_Nm string,
+            Country_Cd string,
+            Market_Ds string,
+            Market_Cd string
+    FROM @storeIn
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
+
+@mediaTable =
+    EXTRACT RecordId string,
+            StoreNumber string,
+            TransactionType string,
+            DayNumber string,
+            ShiftNumber string,
+            TransactionUID string,
+            SequenceNumber string,
+            MediaNumber string,
+            NetworkMediaSequenceNumber string,
+            MediaType string,
+            RecordCount string,
+            RecordAmount int,
+            RecordType int,
+            ErrorCorrectionFlag string,
+            VoidFlag string,
+            ExchangeRate string,
+            ForeignAmount string
+    FROM @mediaIn
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
+
+@storeTable_valid =
+    SELECT *
+    FROM @storeTable AS s
+    WHERE
+    Country_Cd == "US"
+    AND s.Owner_Cd != "X"
+    AND s.Owner_Cd != ""
+    AND s.Owner_Cd IS NOT NULL
+    AND s.Zone_Nm != "Asset Management"
+    AND s.Zone_Nm != "US Unallocated"
+    AND s.Zone_Nm != ""
+    AND s.Zone_Nm IS NOT NULL
+    AND s.Zone_Cd != "0"
+    AND s.Active_Fg == 1
+    AND s.Dark_Fg != 1
+
+    UNION
+
+    SELECT *
+    FROM @storeTable AS s
+    WHERE Country_Cd == "CA"
+          AND s.Active_Fg == 1
+          AND s.Zone_Nm != "Asset Management"
+          AND s.Zone_Nm != "CA Unallocated"
+          AND s.Zone_Cd != "0"
+          AND s.Zone_Nm != ""
+          AND s.Zone_Nm IS NOT NULL
+          AND s.Dark_Fg != 1;
 
 //Department table is already unique on the 4 keys but still deduping it
-@header_1 =
+@headerWithPk =
     SELECT X. *,
            X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
     FROM @headerTable AS X;
 
-
-@detailsTable_1 =
+@detailsWithPlu =
     SELECT DISTINCT *,
                     InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
     FROM @detailsTable AS X;
 
-
-@mediaSales_1 =
+@mediaSales =
     SELECT DISTINCT *
     FROM @mediaTable;
-
 
 @result =
     SELECT X.EndDate AS EndDate,
@@ -159,17 +196,20 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
            "Unknown" AS Media_Type,
            COUNT(DISTINCT X.Uniq_Id) AS Txn_Cnt,
            SUM(DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount
-    FROM @header_1 AS X
+    FROM @headerWithPk AS X
          INNER JOIN
-             @detailsTable_1 AS DT1
+             @detailsWithPlu AS DT1
          ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
          INNER JOIN
-             @mediaSales_1 AS MS1
+             @mediaSales AS MS1
          ON X.DayNumber == MS1.DayNumber AND X.StoreNumber == MS1.StoreNumber AND X.ShiftNumber == MS1.ShiftNumber AND X.TransactionUID == MS1.TransactionUID
          INNER JOIN
              @productTable AS p
          ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU
-    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18) //AND TransactionCode==3  
+         INNER JOIN
+             @storeTable_valid AS s
+         ON s.Store_Id == X.StoreNumber
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5) //AND TransactionCode==3  
           AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
     GROUP BY X.EndDate,
              X.StoreNumber,
@@ -181,7 +221,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
              MediaType == "SV"? "SERVICE CARD" :
              "Unknown";
 
-
 OUTPUT @result
-TO @tenderTypeOut
+TO @outputFile
 USING Outputters.Csv(outputHeader : true, quoting : false);
