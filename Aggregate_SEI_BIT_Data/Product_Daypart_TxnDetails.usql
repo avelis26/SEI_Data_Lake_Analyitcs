@@ -5,15 +5,16 @@ CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
 FROM AZURESQLDB
 WITH
 (
-	PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
-	CREDENTIAL = MyAzureSQLDBCredential,
-	REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
+CREDENTIAL = MyAzureSQLDBCredential,
+REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
 */
-DECLARE @datedFolder string = "20171112";
+DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
+DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
 DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
 DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
 /*
@@ -78,7 +79,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     FROM @detailsIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
-
 @productTable =
     EXTRACT ProductMaster_Id int,
             slin int,
@@ -86,7 +86,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             Category_Cd string,
             Category_Ds string,
             Depart_Cd int,
-            Manufacturer_Cd string,  // fix rockstar
+            Manufacturer_Cd string,
             Manufacturer_Nm string,
             PSA_Cd string,
             PSA_Ds string,
@@ -105,19 +105,55 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     FROM @productIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
+@storeTable =
+    EXTRACT Store_Id int,
+            Market_Cd string,
+            Market_Ds string,
+            Active_Fg int,
+            Owner_Cd string,
+            Zone_Nm string
+    FROM @storeIn
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
+
+@storeTable_valid =
+    SELECT *
+    FROM @storeTable AS s
+    WHERE
+    Country_Cd == "US"
+    AND s.Owner_Cd != "X"
+    AND s.Owner_Cd != ""
+    AND s.Owner_Cd IS NOT NULL
+    AND s.Zone_Nm != "Asset Management"
+    AND s.Zone_Nm != "US Unallocated"
+    AND s.Zone_Nm != ""
+    AND s.Zone_Nm IS NOT NULL
+    AND s.Zone_Cd != "0"
+    AND s.Active_Fg == 1
+    AND s.Dark_Fg != 1
+
+    UNION
+
+    SELECT *
+    FROM @storeTable AS s
+    WHERE Country_Cd == "CA"
+          AND s.Active_Fg == 1
+          AND s.Zone_Nm != "Asset Management"
+          AND s.Zone_Nm != "CA Unallocated"
+          AND s.Zone_Cd != "0"
+          AND s.Zone_Nm != ""
+          AND s.Zone_Nm IS NOT NULL
+          AND s.Dark_Fg != 1;
 
 //Making the header table data unique as there are duplicate records
-@header_1 =
+@headerWithPk =
     SELECT X. *,
            X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
-    FROM @headerTable AS X;
+    FROM @HeaderTable AS X;
 
-
-@detailsTable_1 =
+@detailsWithPk =
     SELECT DISTINCT X. *,
-                    InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
-    FROM @detailsTable AS X;
-
+                    InsightReportingUSQL.helper.remLeadingZero(X.PLUNumber) AS String_PLU
+    FROM @DetailsTable AS X;
 
 @result =
     SELECT X.EndDate,
@@ -134,24 +170,36 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
            COUNT(DISTINCT X.EndTime BETWEEN 140001 AND 160000? Uniq_Id : NULL) AS Txn_Cnt_DayP5,
            COUNT(DISTINCT X.EndTime BETWEEN 160001 AND 190000? Uniq_Id : NULL) AS Txn_Cnt_DayP6,
            COUNT(DISTINCT X.EndTime BETWEEN 190001 AND 235959? Uniq_Id : NULL) AS Txn_Cnt_DayP7,
-           SUM(X.EndTime BETWEEN 000000 AND 060000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP1,
-           SUM(X.EndTime BETWEEN 060001 AND 090000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP2,
-           SUM(X.EndTime BETWEEN 090001 AND 110000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP3,
-           SUM(X.EndTime BETWEEN 110001 AND 140000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP4,
-           SUM(X.EndTime BETWEEN 140001 AND 160000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP5,
-           SUM(X.EndTime BETWEEN 160001 AND 190000? RecordAmount / 100f : 0) AS Ttl_Amt_DayP6,
-           SUM(X.EndTime BETWEEN 190001 AND 235959? RecordAmount / 100f : 0) AS Ttl_Amt_DayP7
-    FROM @header_1 AS X
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
+
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
+    FROM @headerWithPk AS X
          INNER JOIN
-             @detailsTable_1 AS DT1
+             @detailsWithPk AS DT1
          ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
          //AND X.TransactionSequence==DT1.SequenceNumber
          INNER JOIN
              @productTable AS p
          ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU
+         INNER JOIN
+             @storeTable_valid AS s
+         ON s.Store_Id == X.StoreNumber
 
-    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18) //AND TransactionCode==3  
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5)
           AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
+
     GROUP BY X.EndDate,
              X.StoreNumber,
              p.PSA_Cd,
@@ -159,7 +207,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
              p.Category_Cd,
              p.Category_Ds,
              RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member";
-
 
 OUTPUT @result
 TO @productDaypartOut
