@@ -5,17 +5,18 @@ CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
 FROM AZURESQLDB
 WITH
 (
-    PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
-    CREDENTIAL = MyAzureSQLDBCredential,
-    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
+CREDENTIAL = MyAzureSQLDBCredential,
+REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
 */
-DECLARE @datedFolder string = "20171112";
+DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
+DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
 DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
-DECLARE @storeItemtOut string = @outPathRoot + @datedFolder + "_Store_Item_Txn_TotalAmt.csv";
+DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Store_Item_Txn_TotalAmt.csv";
 /*
 DECLARE @datedFolder string = "20171023";
 DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
@@ -27,26 +28,25 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 @headerTable =
     EXTRACT RecordId string,
             StoreNumber int,
-            TransactionType int,
+            TransactionType string,
             DayNumber int,
             ShiftNumber int,
             TransactionUID int,
             Aborted string,
-            DeviceNumber int,
-            DeviceType int,
-            EmployeeNumber int,
-            EndDate int,
+            DeviceNumber string,
+            DeviceType string,
+            EmployeeNumber string,
+            EndDate string,
             EndTime int,
-            StartDate int,
-            StartTime int,
-            Status int,
-            TotalAmount int,
-            TransactionCode int,
-            TransactionSequence int,
+            StartDate string,
+            StartTime string,
+            Status string,
+            TotalAmount string,
+            TransactionCode string,
+            TransactionSequence string,
             RewardMemberID string
     FROM @headerIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
 
 @detailsTable =
     EXTRACT RecordID string,
@@ -114,9 +114,8 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             Country_Cd string,
             Market_Ds string,
             Market_Cd string
-
-    FROM @"\Parsed\20170910\storeTable.csv"
-    USING Extractors.Csv(skipFirstNRows : 1);
+    FROM @storeIn
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
 @storeTable_valid =
     SELECT *
@@ -148,23 +147,17 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
           AND s.Dark_Fg != 1;
 
 //Making the header table data unique as there are duplicate records
-@Header_1 =
+@headerWithPk =
     SELECT DISTINCT X. *,
                     X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
     FROM @HeaderTable AS X;
 
-
-@DetailsTable_1 =
+@detailsWithPlu =
     SELECT DISTINCT *,
-                    InsightReportingUSQL.helper.remLeadingZero(PLUNumber) AS String_PLU
+                    InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
     FROM @DetailsTable;
 
-
-
-
-
-
-@RESULT_1 =
+@result =
     SELECT EndDate,
            StoreNumber,
            Member_Status,
@@ -176,14 +169,14 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
     (
         SELECT X.EndDate,
                X.StoreNumber,
-               [7RewardMemberID] == null OR [7RewardMemberID] == "                   "? "Non_Member" : "Member" AS Member_Status,
+               RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
                COUNT(DISTINCT Uniq_Id) AS Txn_Cnt,
                SUM(DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) AS ItemCount,
                SUM(DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount,
-               COUNT(DISTINCT [7RewardMemberID]) AS Unique_member_count
-        FROM @Header_1 AS X
+               COUNT(DISTINCT RewardMemberID) AS Unique_member_count
+        FROM @headerWithPk AS X
              INNER JOIN
-                 @DetailsTable_1 AS DT1
+                 @detailsWithPlu AS DT1
              ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
              //AND X.TransactionSequence==DT1.SequenceNumber
              INNER JOIN
@@ -197,12 +190,9 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
               AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
         GROUP BY X.EndDate,
                  X.StoreNumber,
-                 [7RewardMemberID]==null OR [7RewardMemberID]=="                   " ? "Non_Member":"Member"
+                 RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member"
     ) AS X;
 
-
-
-
-OUTPUT @RESULT_1
-TO @"/Output/Store_Item_Txn_TotalAmt.csv"
-USING Outputters.Csv(outputHeader : true);
+OUTPUT @result
+TO @productDaypartOut
+USING Outputters.Csv(outputHeader : true, quoting : false);
