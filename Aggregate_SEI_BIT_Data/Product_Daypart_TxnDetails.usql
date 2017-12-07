@@ -60,7 +60,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             ProductNumber int,
             PLUNumber string,
             RecordAmount int,
-            RecordCount string,
+            RecordCount int,
             RecordType int,
             SizeIndx string,
             ErrorCorrectionFlag string,
@@ -107,11 +107,14 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 
 @storeTable =
     EXTRACT Store_Id int,
-            Market_Cd string,
-            Market_Ds string,
+            Zone_Cd string,
             Active_Fg int,
+            Dark_Fg int,
             Owner_Cd string,
-            Zone_Nm string
+            Zone_Nm string,
+            Country_Cd string,
+            Market_Ds string,
+            Market_Cd string
     FROM @storeIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 
@@ -152,7 +155,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 
 @detailsWithPk =
     SELECT DISTINCT X. *,
-                    InsightReportingUSQL.helper.remLeadingZero(X.PLUNumber) AS String_PLU
+                    InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
     FROM @detailsTable AS X;
 
 @result =
@@ -177,7 +180,6 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
            SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
            SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
            SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
-
            SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
            SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
            SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
