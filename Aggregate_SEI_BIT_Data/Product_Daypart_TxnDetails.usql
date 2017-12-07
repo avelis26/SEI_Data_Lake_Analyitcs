@@ -148,12 +148,12 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
 @headerWithPk =
     SELECT X. *,
            X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
-    FROM @HeaderTable AS X;
+    FROM @headerTable AS X;
 
 @detailsWithPk =
     SELECT DISTINCT X. *,
                     InsightReportingUSQL.helper.remLeadingZero(X.PLUNumber) AS String_PLU
-    FROM @DetailsTable AS X;
+    FROM @detailsTable AS X;
 
 @result =
     SELECT X.EndDate,
