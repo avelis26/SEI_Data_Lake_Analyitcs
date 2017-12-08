@@ -4,7 +4,7 @@ CREATE DATA SOURCE [7ELE_dbo_TRNS_ProductMaster]
 FROM AZURESQLDB
 WITH
 (
-    CREDENTIAL = gpink003,
-	PROVIDER_STRING = "Database=7ELE;Trusted_Connection=False;Encrypt=True"
-    //REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+    CREDENTIAL = gpink003_instance,
+	PROVIDER_STRING = "Database=7ELE;Trusted_Connection=False;Encrypt=True",
+    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );
