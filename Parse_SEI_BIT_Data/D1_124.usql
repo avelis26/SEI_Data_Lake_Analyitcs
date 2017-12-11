@@ -1,6 +1,6 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-
+// @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
 DECLARE @datedFolder string = "20171112";
 DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
 DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
