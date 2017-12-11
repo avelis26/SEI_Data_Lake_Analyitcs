@@ -1,15 +1,15 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
 // @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
-DECLARE @datedFolder string = "20171023";
+DECLARE @datedFolder string = "20171107";
 // DECLARE @adlsRoot string = "adl://mscrmprodadls.azuredatalakestore.net/"; // used for remote execution
-DECLARE @adlsRoot string = "/"; // used for local testing
+DECLARE @adlsRoot string = "/CRM/"; // used for local testing
 DECLARE @headerIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = @adlsRoot + "Temp/productTable.csv";
 DECLARE @storeIn string = @adlsRoot + "Temp/storeTable.csv";
 DECLARE @outPathRoot string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/";
-DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
+DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Store_Item_TxnTotal.csv";
 
 @headerTable =
     EXTRACT RecordId string,
