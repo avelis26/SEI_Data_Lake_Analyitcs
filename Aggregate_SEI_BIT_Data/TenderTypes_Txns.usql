@@ -2,21 +2,16 @@
 REFERENCE ASSEMBLY [Assemblies];
 // @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
 DECLARE @datedFolder string = "20171112";
-DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
-DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
-DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
-DECLARE @mediaIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
-DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
-DECLARE @outputFile string = @outPathRoot + @datedFolder + "_TenderTypes_Txns.csv";
-/*
-DECLARE @datedFolder string = "20171023";
-DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
-DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @productIn string = "/BIT_CRM/productTable.csv";
-DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
-DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
-*/
+// DECLARE @adlsRoot string = "adl://mscrmprodadls.azuredatalakestore.net/"; // used for remote execution
+DECLARE @adlsRoot string = "/"; // used for local testing
+DECLARE @headerIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
+DECLARE @detailsIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
+DECLARE @mediaIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
+DECLARE @productIn string = @adlsRoot + "Temp/productTable.csv";
+DECLARE @storeIn string = @adlsRoot + "Temp/storeTable.csv";
+DECLARE @outPathRoot string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/";
+DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
+
 @headerTable =
     EXTRACT RecordId string,
             StoreNumber int,
