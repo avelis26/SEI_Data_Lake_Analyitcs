@@ -1,10 +1,10 @@
 ﻿USE DATABASE [master];
 
-CREATE DATA SOURCE [7ELE_dbo_TRNS_ProductMaster]
+CREATE DATA SOURCE [MsProdSqlDw_7ELE]
 FROM AZURESQLDB
 WITH
 (
     CREDENTIAL = gpink003_instance,
-	PROVIDER_STRING = "Database=7ELE;Trusted_Connection=False;Encrypt=True",
-    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
+	PROVIDER_STRING = "Database=7ELE;Trusted_Connection=False;Encrypt=True"
+    //REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
 );

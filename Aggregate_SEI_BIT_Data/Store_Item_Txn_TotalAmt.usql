@@ -172,8 +172,8 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
                X.StoreNumber,
                RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
                COUNT(DISTINCT Uniq_Id) AS Txn_Cnt,
-               SUM(DT1.RecordType IN(5, 18) ? (- 1) * RecordCount : (1) * RecordCount) - SUM(DT1.RecordType IN(18) ? (- 1) * RecordCount : (1) * RecordCount) AS ItemCount,
-               SUM(DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) - SUM(DT1.RecordType IN(18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount, 
+               SUM(DT1.RecordType IN(5, 18) ? (- 1) * RecordCount : (1) * RecordCount) AS ItemCount,
+               SUM(DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount, 
                COUNT(DISTINCT RewardMemberID) AS Unique_member_count
         FROM @headerWithPk AS X
              INNER JOIN

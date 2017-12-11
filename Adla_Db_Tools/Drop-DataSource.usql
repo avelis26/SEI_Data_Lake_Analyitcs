@@ -1,0 +1,3 @@
+﻿USE DATABASE [master];
+
+DROP DATA SOURCE [7ELE_dbo_TRNS_ProductMaster];

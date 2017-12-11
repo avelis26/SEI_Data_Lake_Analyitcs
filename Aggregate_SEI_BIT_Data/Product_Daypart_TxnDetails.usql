@@ -1,31 +1,49 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-/*
-CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
-FROM AZURESQLDB
-WITH
-(
-	PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
-	CREDENTIAL = MyAzureSQLDBCredential,
-	REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
-);
-*/
-DECLARE @datedFolder string = "20171023";
 // @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+DECLARE @datedFolder string = "20171107";
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
+//DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable_TEST.csv";
 DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
-DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/" + @datedFolder + "/";
+DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
 DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
-/*
-DECLARE @datedFolder string = "20171023";
-DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
-DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @productIn string = "/BIT_CRM/productTable.csv";
-DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
-DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
-*/
+@productTable =
+    SELECT *
+    FROM EXTERNAL [MsProdSqlDw_7ELE] EXECUTE
+	@"SELECT
+	   [ProductMaster_Id]
+      ,[slin]
+      ,[upc]
+      ,[Category_Cd]
+      ,[Category_Ds]
+      ,case when ISNULL([Depart_Cd], 0)='' then 0 else ISNULL([Depart_Cd], 0) end AS [Depart_Cd]
+      ,[Manufacturer_Cd]
+      ,[Manufacturer_Nm]
+      ,[PSA_Cd]
+      ,[PSA_Ds]
+      ,[Item_Ds]
+      ,[SubCategory_Cd]
+      ,[SubCategory_Ds]
+      ,[VerticalClass_Cd]
+      ,[VerticalClass_Ds]
+      ,[CorpBrand]
+      ,[UPCType_Cd]
+      ,[AgeRestricted_Fg]
+      ,[CurrentImport_Id]
+      ,[OriginalImport_Id]
+      ,[Modified_Dttm]
+      ,[Created_Dttm]
+     FROM [dbo].[TRNS_ProductMaster]";
 @headerTable =
     EXTRACT RecordId string,
             StoreNumber int,
@@ -79,7 +97,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             CouponCount string
     FROM @detailsIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
+/*
 @productTable =
     EXTRACT ProductMaster_Id int,
             slin int,
@@ -105,7 +123,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
             Created_Dttm string
     FROM @productIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
+*/
 @storeTable =
     EXTRACT Store_Id int,
             Zone_Cd string,
@@ -174,20 +192,20 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
            COUNT(DISTINCT X.EndTime BETWEEN 140001 AND 160000? Uniq_Id : NULL) AS Txn_Cnt_DayP5,
            COUNT(DISTINCT X.EndTime BETWEEN 160001 AND 190000? Uniq_Id : NULL) AS Txn_Cnt_DayP6,
            COUNT(DISTINCT X.EndTime BETWEEN 190001 AND 235959? Uniq_Id : NULL) AS Txn_Cnt_DayP7,
-           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP1,
-           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP2,
-           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP3,
-           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP4,
-           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
-           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
-           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
-           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
-           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
-           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
-           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP4,
-           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP5,
-           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP6,
-           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
     FROM @headerWithPk AS X
          INNER JOIN
              @detailsWithPk AS DT1
@@ -195,12 +213,12 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
          //AND X.TransactionSequence==DT1.SequenceNumber
          INNER JOIN
              @productTable AS p
-         ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU
+         ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU // int == int AND varchar == string
          INNER JOIN
              @storeTable_valid AS s
-         ON s.Store_Id == X.StoreNumber
+         ON s.Store_Id == X.StoreNumber // int == int
 
-    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5)
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18)
           AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
 
     GROUP BY X.EndDate,
