@@ -1,15 +1,6 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
+// @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
 DECLARE @datedFolder string = "20171107";
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";

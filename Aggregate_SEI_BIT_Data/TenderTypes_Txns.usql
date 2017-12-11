@@ -1,17 +1,7 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-/*
-CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
-FROM AZURESQLDB
-WITH
-(
-    PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
-    CREDENTIAL = MyAzureSQLDBCredential,
-    REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
-);
-*/
+// @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
 DECLARE @datedFolder string = "20171112";
-// @datedFolder HAS to be row 13, DO NOT MOVE!!!
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";

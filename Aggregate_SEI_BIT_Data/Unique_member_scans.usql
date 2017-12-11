@@ -1,28 +1,12 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
-/*
-CREATE DATA SOURCE IF NOT EXISTS MyAzureSQLDBDataSource
-FROM AZURESQLDB
-WITH
-(
-	PROVIDER_STRING = "Database=AdventureWorksLT;Trusted_Connection=False;Encrypt=True",
-	CREDENTIAL = MyAzureSQLDBCredential,
-	REMOTABLE_TYPES = (bool, byte, sbyte, short, ushort, int, uint, long, ulong, decimal, float, double, string, DateTime)
-);
-*/
+
 DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
 DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
 DECLARE @outPathRoot string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/Aggregates/";
 DECLARE @outputFile_1 string = @outPathRoot + "Unique_Member_Scans_10-23_to_11-22-2017/" + "Unique_Member_Scans_MARKET.csv";
 DECLARE @outputFile_2 string = @outPathRoot + "Unique_Member_Scans_10-23_to_11-22-2017/" + "Unique_Member_Scans_STORE.csv";
-/*
-DECLARE @datedFolder string = "20171023";
-DECLARE @headerIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
-DECLARE @detailsIn string = "/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-DECLARE @productIn string = "/BIT_CRM/productTable.csv";
-DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
-DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
-*/
+
 @headerTable =
     EXTRACT RecordId string,
             StoreNumber int,
