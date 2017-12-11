@@ -192,20 +192,20 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_Txn
            COUNT(DISTINCT X.EndTime BETWEEN 140001 AND 160000? Uniq_Id : NULL) AS Txn_Cnt_DayP5,
            COUNT(DISTINCT X.EndTime BETWEEN 160001 AND 190000? Uniq_Id : NULL) AS Txn_Cnt_DayP6,
            COUNT(DISTINCT X.EndTime BETWEEN 190001 AND 235959? Uniq_Id : NULL) AS Txn_Cnt_DayP7,
-           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP1,
-           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP2,
-           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP3,
-           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP4,
-           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
-           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
-           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
-           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
-           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
-           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
-           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP4,
-           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP5,
-           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP6,
-           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
     FROM @headerWithPk AS X
          INNER JOIN
              @detailsWithPk AS DT1
@@ -218,7 +218,7 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_Txn
              @storeTable_valid AS s
          ON s.Store_Id == X.StoreNumber // int == int
 
-    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5)
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18)
           AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
 
     GROUP BY X.EndDate,
