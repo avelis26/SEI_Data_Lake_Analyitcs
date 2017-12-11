@@ -22,6 +22,7 @@
   <ItemGroup>
     <Script Include="Create-DataSource.usql" />
     <Script Include="Create-ProductMasterTable.usql" />
+    <Script Include="Drop-DataSource.usql" />
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>
