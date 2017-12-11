@@ -195,7 +195,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
            MediaType == "SV"? "SERVICE CARD" :
            "Unknown" AS Media_Type,
            COUNT(DISTINCT X.Uniq_Id) AS Txn_Cnt,
-           SUM(DT1.RecordType IN(5) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount
+           SUM(DT1.RecordType IN(5,18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount
     FROM @headerWithPk AS X
          INNER JOIN
              @detailsWithPlu AS DT1
@@ -209,7 +209,7 @@ DECLARE @productDaypartOut string = @outPathRoot + @datedFolder + "_Product_Dayp
          INNER JOIN
              @storeTable_valid AS s
          ON s.Store_Id == X.StoreNumber
-    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5) //AND TransactionCode==3  
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5,18) //AND TransactionCode==3  
           AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
     GROUP BY X.EndDate,
              X.StoreNumber,
