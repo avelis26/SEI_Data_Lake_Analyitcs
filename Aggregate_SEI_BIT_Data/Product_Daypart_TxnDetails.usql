@@ -4,37 +4,11 @@ REFERENCE ASSEMBLY [Assemblies];
 DECLARE @datedFolder string = "20171107";
 DECLARE @headerIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
-//DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable_TEST.csv";
+DECLARE @productIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/productTable.csv";
 DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
 DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
 DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
-@productTable =
-    SELECT *
-    FROM EXTERNAL [MsProdSqlDw_7ELE] EXECUTE
-	@"SELECT
-	   [ProductMaster_Id]
-      ,[slin]
-      ,[upc]
-      ,[Category_Cd]
-      ,[Category_Ds]
-      ,case when ISNULL([Depart_Cd], 0)='' then 0 else ISNULL([Depart_Cd], 0) end AS [Depart_Cd]
-      ,[Manufacturer_Cd]
-      ,[Manufacturer_Nm]
-      ,[PSA_Cd]
-      ,[PSA_Ds]
-      ,[Item_Ds]
-      ,[SubCategory_Cd]
-      ,[SubCategory_Ds]
-      ,[VerticalClass_Cd]
-      ,[VerticalClass_Ds]
-      ,[CorpBrand]
-      ,[UPCType_Cd]
-      ,[AgeRestricted_Fg]
-      ,[CurrentImport_Id]
-      ,[OriginalImport_Id]
-      ,[Modified_Dttm]
-      ,[Created_Dttm]
-     FROM [dbo].[TRNS_ProductMaster]";
+
 @headerTable =
     EXTRACT RecordId string,
             StoreNumber int,
@@ -57,7 +31,6 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_Txn
             RewardMemberID string
     FROM @headerIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
 
 @detailsTable =
     EXTRACT RecordID string,
@@ -88,7 +61,7 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_Txn
             CouponCount string
     FROM @detailsIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-/*
+
 @productTable =
     EXTRACT ProductMaster_Id int,
             slin int,
@@ -114,6 +87,34 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_Txn
             Created_Dttm string
     FROM @productIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
+/*
+@productTable =
+    SELECT *
+    FROM EXTERNAL [MsProdSqlDw_7ELE] EXECUTE
+	@"SELECT
+	   [ProductMaster_Id]
+      ,[slin]
+      ,[upc]
+      ,[Category_Cd]
+      ,[Category_Ds]
+      ,case when ISNULL([Depart_Cd], 0)='' then 0 else ISNULL([Depart_Cd], 0) end AS [Depart_Cd]
+      ,[Manufacturer_Cd]
+      ,[Manufacturer_Nm]
+      ,[PSA_Cd]
+      ,[PSA_Ds]
+      ,[Item_Ds]
+      ,[SubCategory_Cd]
+      ,[SubCategory_Ds]
+      ,[VerticalClass_Cd]
+      ,[VerticalClass_Ds]
+      ,[CorpBrand]
+      ,[UPCType_Cd]
+      ,[AgeRestricted_Fg]
+      ,[CurrentImport_Id]
+      ,[OriginalImport_Id]
+      ,[Modified_Dttm]
+      ,[Created_Dttm]
+     FROM [dbo].[TRNS_ProductMaster]";
 */
 @storeTable =
     EXTRACT Store_Id int,
