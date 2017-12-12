@@ -1,16 +1,17 @@
 ﻿USE DATABASE [master];
 REFERENCE ASSEMBLY [Assemblies];
 // @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
-DECLARE @datedFolder string = "20171107";
+DECLARE @datedFolder string = "20171023";
 DECLARE @adlsRoot string = "adl://mscrmprodadls.azuredatalakestore.net/"; // used for remote execution
 //DECLARE @adlsRoot string = "/CRM/"; // used for local testing
 DECLARE @headerIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @mediaIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
-//DECLARE @productIn string = @adlsRoot + "Temp/productTable.csv";
 DECLARE @storeIn string = @adlsRoot + "Temp/storeTable.csv";
 DECLARE @outPathRoot string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/";
-DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnType.csv";
+DECLARE @prodOutputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_TxnDetails.csv";
+DECLARE @storOutputFile string = @outPathRoot + @datedFolder + "_Store_Item_TxnTotal.csv";
+DECLARE @tendOutputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnType.csv";
 
 @headerTable =
     EXTRACT RecordId string,
@@ -64,33 +65,7 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
             CouponCount string
     FROM @detailsIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-/*
-@productTable =
-    EXTRACT ProductMaster_Id int,
-            slin int,
-            upc string,
-            Category_Cd string,
-            Category_Ds string,
-            Depart_Cd int,
-            Manufacturer_Cd string,
-            Manufacturer_Nm string,
-            PSA_Cd string,
-            PSA_Ds string,
-            Item_Ds string,
-            SubCategory_Cd string,
-            SubCategory_Ds string,
-            VerticalClass_Cd string,
-            VerticalClass_Ds string,
-            CorpBrand string,
-            UPCType_Cd string,
-            AgeRestricted_Fg string,
-            CurrentImport_Id string,
-            OriginalImport_Id string,
-            Modified_Dttm string,
-            Created_Dttm string
-    FROM @productIn
-    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-*/
+
 @productTable =
     SELECT ProductMaster_Id,
            slin,
@@ -246,14 +221,14 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
           AND s.Zone_Nm IS NOT NULL
           AND s.Dark_Fg != 1;
 
-//Department table is already unique on the 4 keys but still deduping it
+//Making the header table data unique as there are duplicate records
 @headerWithPk =
-    SELECT X. *,
-           X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
+    SELECT DISTINCT X. *,
+                    X.DayNumber.ToString() + X.ShiftNumber.ToString() + X.StoreNumber.ToString() + X.TransactionUID.ToString() + X.TransactionSequence.ToString() AS Uniq_Id
     FROM @headerTable AS X;
 
 @detailsWithPlu =
-    SELECT DISTINCT *,
+    SELECT DISTINCT X. *,
                     InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
     FROM @detailsTable AS X;
 
@@ -261,7 +236,95 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
     SELECT DISTINCT *
     FROM @mediaTable;
 
-@result =
+@productResult =
+    SELECT X.EndDate,
+           X.StoreNumber,
+           p.PSA_Cd,
+           p.PSA_Ds,
+           p.Category_Cd,
+           p.Category_Ds,
+           RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
+           COUNT(DISTINCT X.EndTime BETWEEN 000000 AND 060000? Uniq_Id : NULL) AS Txn_Cnt_DayP1,
+           COUNT(DISTINCT X.EndTime BETWEEN 060001 AND 090000? Uniq_Id : NULL) AS Txn_Cnt_DayP2,
+           COUNT(DISTINCT X.EndTime BETWEEN 090001 AND 110000? Uniq_Id : NULL) AS Txn_Cnt_DayP3,
+           COUNT(DISTINCT X.EndTime BETWEEN 110001 AND 140000? Uniq_Id : NULL) AS Txn_Cnt_DayP4,
+           COUNT(DISTINCT X.EndTime BETWEEN 140001 AND 160000? Uniq_Id : NULL) AS Txn_Cnt_DayP5,
+           COUNT(DISTINCT X.EndTime BETWEEN 160001 AND 190000? Uniq_Id : NULL) AS Txn_Cnt_DayP6,
+           COUNT(DISTINCT X.EndTime BETWEEN 190001 AND 235959? Uniq_Id : NULL) AS Txn_Cnt_DayP7,
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) : 0) AS Ttl_Amt_DayP7,
+           SUM(X.EndTime BETWEEN 000000 AND 060000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP1,
+           SUM(X.EndTime BETWEEN 060001 AND 090000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP2,
+           SUM(X.EndTime BETWEEN 090001 AND 110000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP3,
+           SUM(X.EndTime BETWEEN 110001 AND 140000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP4,
+           SUM(X.EndTime BETWEEN 140001 AND 160000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP5,
+           SUM(X.EndTime BETWEEN 160001 AND 190000? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP6,
+           SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
+    FROM @headerWithPk AS X
+         INNER JOIN
+             @detailsWithPlue AS DT1
+         ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
+         //AND X.TransactionSequence==DT1.SequenceNumber
+         INNER JOIN
+             @productTable AS p
+         ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU // int == int AND varchar == string
+         INNER JOIN
+             @storeTable_valid AS s
+         ON s.Store_Id == X.StoreNumber // int == int
+
+    WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18)
+          AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
+
+    GROUP BY X.EndDate,
+             X.StoreNumber,
+             p.PSA_Cd,
+             p.PSA_Ds,
+             p.Category_Cd,
+             p.Category_Ds,
+             RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member";
+
+@storeResult =
+    SELECT EndDate,
+           StoreNumber,
+           Member_Status,
+           Txn_Cnt,
+           ItemCount,
+           TotalAmount,
+           Member_Status == "Non_Member"? 0 : Unique_member_count AS Unique_member_count
+    FROM
+    (
+        SELECT X.EndDate,
+               X.StoreNumber,
+               RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
+               COUNT(DISTINCT Uniq_Id) AS Txn_Cnt,
+               SUM(DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) AS ItemCount,
+               SUM(DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount,
+               COUNT(DISTINCT RewardMemberID) AS Unique_member_count
+        FROM @headerWithPk AS X
+             INNER JOIN
+                 @detailsWithPlu AS DT1
+             ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
+             //AND X.TransactionSequence==DT1.SequenceNumber
+             INNER JOIN
+                 @productTable AS p
+             ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU // int == int AND varchar == string
+             INNER JOIN
+                 @storeTable_valid AS s
+             ON s.Store_Id == X.StoreNumber
+
+        WHERE Aborted == "N" AND DT1.VoidFlag == "N" AND DT1.RecordType IN(1, 5, 18)
+              AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) //340202: LOTTERY, 340101: MONEY ORDERS,341003,341103,340821: GIFTCARDS 
+        GROUP BY X.EndDate,
+                 X.StoreNumber,
+                 RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member"
+    ) AS X;
+
+@tenderResult =
     SELECT X.EndDate AS EndDate,
            X.StoreNumber,
            RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
@@ -300,6 +363,14 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
              MediaType == "SV"? "SERVICE CARD" :
              "Unknown";
 
-OUTPUT @result
-TO @outputFile
+OUTPUT @productResult
+TO @prodOutputFile
+USING Outputters.Csv(outputHeader : true, quoting : false);
+
+OUTPUT @storeResult
+TO @storOutputFile
+USING Outputters.Csv(outputHeader : true, quoting : false);
+
+OUTPUT @tenderResult
+TO @tendOutputFile
 USING Outputters.Csv(outputHeader : true, quoting : false);
