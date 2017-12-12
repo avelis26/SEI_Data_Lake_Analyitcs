@@ -267,7 +267,7 @@ DECLARE @tendOutputFile string = @outPathRoot + @datedFolder + "_Tender_Types_Tx
            SUM(X.EndTime BETWEEN 190001 AND 235959? (DT1.RecordType IN(5, 18) ? ( - 1) * RecordCount : (1) * RecordCount) : 0) AS Ttl_Itm_Amt_DayP7
     FROM @headerWithPk AS X
          INNER JOIN
-             @detailsWithPlue AS DT1
+             @detailsWithPlu AS DT1
          ON X.DayNumber == DT1.DayNumber AND X.StoreNumber == DT1.StoreNumber AND X.ShiftNumber == DT1.ShiftNumber AND X.TransactionUID == DT1.TransactionUID
          //AND X.TransactionSequence==DT1.SequenceNumber
          INNER JOIN
