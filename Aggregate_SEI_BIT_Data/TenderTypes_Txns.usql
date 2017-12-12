@@ -34,6 +34,36 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
             RewardMemberID string
     FROM @headerIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
+
+@detailsTable =
+    EXTRACT RecordID string,
+            StoreNumber int,
+            TransactionType string,
+            DayNumber int,
+            ShiftNumber int,
+            TransactionUID int,
+            SequenceNumber string,
+            ProductNumber int?,
+            PLUNumber string,
+            RecordAmount int,
+            RecordCount int,
+            RecordType int,
+            SizeIndx string,
+            ErrorCorrectionFlag string,
+            PriceOverideFlag string,
+            TaxableFlag string,
+            VoidFlag string,
+            RecommendedFlag string,
+            PriceMultiple string,
+            CarryStatus string,
+            TaxOverideFlag string,
+            PromotionCount string,
+            SalesPrice string,
+            MUBasePrice string,
+            HostItemId string,
+            CouponCount string
+    FROM @detailsIn
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 /*
 @productTable =
     EXTRACT ProductMaster_Id int,
@@ -242,7 +272,7 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
            MediaType == "SV"? "SERVICE CARD" :
            "Unknown" AS Media_Type,
            COUNT(DISTINCT X.Uniq_Id) AS Txn_Cnt,
-           SUM(DT1.RecordType IN(5,18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount
+           SUM(DT1.RecordType IN(5, 18) ? ( - 1) * DT1.RecordAmount / 100f : (1) * DT1.RecordAmount / 100f) AS TotalAmount
     FROM @headerWithPk AS X
          INNER JOIN
              @detailsWithPlu AS DT1

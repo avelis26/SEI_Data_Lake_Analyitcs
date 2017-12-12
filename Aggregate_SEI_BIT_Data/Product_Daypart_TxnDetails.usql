@@ -33,6 +33,36 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Product_Daypart_Txn
             RewardMemberID string
     FROM @headerIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
+
+@detailsTable =
+    EXTRACT RecordID string,
+            StoreNumber int,
+            TransactionType string,
+            DayNumber int,
+            ShiftNumber int,
+            TransactionUID int,
+            SequenceNumber string,
+            ProductNumber int?,
+            PLUNumber string,
+            RecordAmount int,
+            RecordCount int,
+            RecordType int,
+            SizeIndx string,
+            ErrorCorrectionFlag string,
+            PriceOverideFlag string,
+            TaxableFlag string,
+            VoidFlag string,
+            RecommendedFlag string,
+            PriceMultiple string,
+            CarryStatus string,
+            TaxOverideFlag string,
+            PromotionCount string,
+            SalesPrice string,
+            MUBasePrice string,
+            HostItemId string,
+            CouponCount string
+    FROM @detailsIn
+    USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
 /*
 @productTable =
     EXTRACT ProductMaster_Id int,
