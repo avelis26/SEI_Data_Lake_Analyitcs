@@ -2,8 +2,8 @@
 REFERENCE ASSEMBLY [Assemblies];
 // @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
 DECLARE @datedFolder string = "20171107";
-DECLARE @adlsRoot string = "adl://mscrmprodadls.azuredatalakestore.net/"; // used for remote execution
-//DECLARE @adlsRoot string = "/CRM/"; // used for local testing
+//DECLARE @adlsRoot string = "adl://mscrmprodadls.azuredatalakestore.net/"; // used for remote execution
+DECLARE @adlsRoot string = "/CRM/"; // used for local testing
 DECLARE @headerIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_121_output.csv";
 DECLARE @detailsIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_122_output.csv";
 DECLARE @mediaIn string = @adlsRoot + "BIT_CRM/" + @datedFolder + "/" + @datedFolder + "_d1_124_output.csv";
@@ -90,7 +90,54 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
             Created_Dttm string
     FROM @productIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
+/*
+@productTable =
+    SELECT *
+    FROM EXTERNAL [MsProdSqlDw_7ELE] EXECUTE
+	@"SELECT [ProductMaster_Id]
+      ,[SLIN] AS [slin]
+	  ,CAST([upc] AS decimal) AS [upc]
+      ,CAST([Category_Cd] AS decimal) AS [Category_Cd]
+      ,[Category_Ds]
+      ,case when ISNULL([Depart_Cd],'0')='' then '0' else ISNULL([Depart_Cd],'0') end AS [Depart_Cd]
+      ,[Manufacturer_Cd]
+      ,[Manufacturer_Nm]
+      ,[PSA_Cd]
+      ,[PSA_Ds]
+      ,[Item_Ds]
+      ,CAST([SubCategory_Cd] AS decimal) AS [SubCategory_Cd]
+      ,[SubCategory_Ds]
+      ,CAST([VerticalClass_Cd] AS decimal) AS [VerticalClass_Cd]
+      ,[VerticalClass_Ds]
+      ,[CorpBrand]
+      ,[UPCType_Cd]
+      ,[AgeRestricted_Fg]
+      ,[CurrentImport_Id]
+      ,[OriginalImport_Id]
+	  ,
+	  CAST(DATEPART(mm, [Modified_Dttm]) AS varchar)
+	  + '/' +
+	  CAST(DATEPART(dd, [Modified_Dttm]) AS varchar)
+	  + '/' +
+	  CAST(DATEPART(yyyy, [Modified_Dttm]) AS varchar)
+	  + ' ' +
+	  CAST(DATEPART(hh, [Modified_Dttm]) AS varchar)
+	  + ':' +
+	  CAST(DATEPART(mi, [Modified_Dttm]) AS varchar)
+	  AS [Modified_Dttm]
+	  ,
+	  CAST(DATEPART(mm, [Created_Dttm]) AS varchar)
+	  + '/' +
+	  CAST(DATEPART(dd, [Created_Dttm]) AS varchar)
+	  + '/' +
+	  CAST(DATEPART(yyyy, [Created_Dttm]) AS varchar)
+	  + ' ' +
+	  CAST(DATEPART(hh, [Created_Dttm]) AS varchar)
+	  + ':' +
+	  CAST(DATEPART(mi, [Created_Dttm]) AS varchar)
+	  AS [Created_Dttm]
+FROM [dbo].[TRNS_ProductMaster]";
+*/
 @storeTable =
     EXTRACT Store_Id int,
             Zone_Cd string,
@@ -103,7 +150,23 @@ DECLARE @outputFile string = @outPathRoot + @datedFolder + "_Tender_Types_TxnTyp
             Market_Cd string
     FROM @storeIn
     USING Extractors.Csv(skipFirstNRows : 1, quoting : true);
-
+/*
+@storeTable =
+ SELECT *
+    FROM EXTERNAL [MsProdSqlDw_7ELE] EXECUTE
+	@"SELECT [Store_Id]
+      ,[Zone_Cd]
+	  ,[Active_Fg]
+	  ,[Dark_Fg]
+	  ,[Owner_Cd]
+	  ,[Zone_Nm]
+	  ,[Country_Cd]
+	  ,[Market_Ds]
+	  ,[Market_Cd]
+FROM [dbo].[STOR_Master] AS SM
+INNER JOIN [dbo].[COMN_Address] AS CA
+ON SM.[PhysicalAddress_Id] = CA.[Address_Id]";
+*/
 @mediaTable =
     EXTRACT RecordId string,
             StoreNumber int,
