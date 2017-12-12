@@ -25,7 +25,7 @@ DECLARE @tendOutputFile string = @outPathRoot + @datedFolder + "_Tender_Types_Tx
             DeviceType string,
             EmployeeNumber string,
             EndDate string,
-            EndTime string,
+            EndTime int,
             StartDate string,
             StartTime string,
             Status string,
@@ -228,8 +228,8 @@ DECLARE @tendOutputFile string = @outPathRoot + @datedFolder + "_Tender_Types_Tx
     FROM @headerTable AS X;
 
 @detailsWithPlu =
-    SELECT DISTINCT X. *,
-                    InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
+    SELECT X. *,
+           InsightReportingUSQL.StringModifier.RemLeadingZero(X.PLUNumber) AS String_PLU
     FROM @detailsTable AS X;
 
 @mediaSales =
