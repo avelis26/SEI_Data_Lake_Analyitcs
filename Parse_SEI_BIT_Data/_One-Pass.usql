@@ -1,0 +1,63 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY [Assemblies];
+// @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
+DECLARE @datedFolder string = "20171112";
+DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
+DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
+DECLARE @d1_121 string = @outPathRoot + @datedFolder + "_" + "d1_121_output.csv";
+/*
+DECLARE @datedFolder string = "20171026";
+DECLARE @in string = "/BIT_CRM/" + @datedFolder + "/{*}";
+DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
+DECLARE @d1_121 string = @outPathRoot + @datedFolder + "_" + "d1_121_output.csv";
+*/
+@bucket_D1_121 =
+	EXTRACT
+		RecordId string,
+		StoreNumber string,
+		TransactionType string,
+		DayNumber string,
+		ShiftNumber string,
+		TransactionUID string,
+		Aborted string,
+		DeviceNumber string,
+		DeviceType string,
+		EmployeeNumber string,
+		EndDate string,
+		EndTime string,
+		StartDate string,
+		StartTime string,
+		Status string,
+		TotalAmount string,
+		TransactionCode string,
+		TransactionSequence string,
+		RewardMemberID string
+	FROM @in
+	USING new MyCustomExtractors.FixedWidthExtractor(
+		new SQL.MAP<string, string> {
+			{"RecordId","2"},
+			{"StoreNumber","6"},
+			{"TransactionType","3"},
+			{"DayNumber","6"},
+			{"ShiftNumber","6"},
+			{"TransactionUID","11"},
+			{"Aborted","1"},
+			{"DeviceNumber","6"},
+			{"DeviceType","6"},
+			{"EmployeeNumber","6"},
+			{"EndDate","8"},
+			{"EndTime","6"},
+			{"StartDate","8"},
+			{"StartTime","6"},
+			{"Status","1"},
+			{"TotalAmount","11"},
+			{"TransactionCode","6"},
+			{"TransactionSequence","11"},
+			{"RewardMemberID","19"}
+		},
+		"121",
+		"D1"
+	);
+OUTPUT @bucket_D1_121
+TO @d1_121
+USING Outputters.Csv(outputHeader:true, quoting:false);

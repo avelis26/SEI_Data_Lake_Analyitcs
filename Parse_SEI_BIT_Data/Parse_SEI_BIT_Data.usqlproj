@@ -44,6 +44,7 @@
     <Script Include="D1_411.usql" />
     <Script Include="D1_462.usql" />
     <Script Include="D1_463.usql" />
+    <Script Include="_One-Pass.usql" />
   </ItemGroup>
   <Import Project="$(AppData)\Microsoft\DataLake\MsBuild\1.0\Usql.targets" />
 </Project>
