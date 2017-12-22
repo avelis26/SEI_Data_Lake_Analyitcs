@@ -35,6 +35,7 @@
     <Script Include="D1_133.usql" />
     <Script Include="D1_134.usql" />
     <Script Include="D1_135.usql" />
+    <Script Include="D1_136-D1_137.usql" />
     <Script Include="D1_136.usql" />
     <Script Include="D1_137.usql" />
     <Script Include="D1_138.usql" />
