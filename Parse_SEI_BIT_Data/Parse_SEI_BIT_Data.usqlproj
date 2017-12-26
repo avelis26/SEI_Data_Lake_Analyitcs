@@ -41,6 +41,7 @@
     <Script Include="D1_138.usql" />
     <Script Include="D1_139.usql" />
     <Script Include="D1_140.usql" />
+    <Script Include="D1_409-D1_410.usql" />
     <Script Include="D1_409.usql" />
     <Script Include="D1_411.usql" />
     <Script Include="D1_462.usql" />
