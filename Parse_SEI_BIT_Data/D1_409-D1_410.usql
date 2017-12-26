@@ -4,8 +4,8 @@ REFERENCE ASSEMBLY [Assemblies];
 DECLARE @datedFolder string = "20171023";
 DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
 DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
-DECLARE @d1_136 string = @outPathRoot + @datedFolder + "_" + "d1_136_output.csv";
-DECLARE @d1_137 string = @outPathRoot + @datedFolder + "_" + "d1_137_output.csv";
+DECLARE @d1_409 string = @outPathRoot + @datedFolder + "_" + "d1_409_output.csv";
+DECLARE @d1_410 string = @outPathRoot + @datedFolder + "_" + "d1_410_output.csv";
 @bucket_D1_136 =
     EXTRACT RecordId string,
             StoreNumber string,
@@ -14,16 +14,43 @@ DECLARE @d1_137 string = @outPathRoot + @datedFolder + "_" + "d1_137_output.csv"
             ShiftNumber string,
             TransactionUID string,
             SequenceNumber string,
-            RecordType string,
+            CouponId string,
+            CouponDescription string,
+            PLUNumber string,
+            CouponType string,
+            CouponValueCode string,
+            EntryMethod string,
+            HostMediaNumber string,
+            RecordAmount string,
+            RecordCount string,
             ErrorCorrectionFlag string,
             VoidFlag string,
             TaxableFlag string,
-            TaxOverideFlag string,
-            PromotionId string,
-            RecordCount string,
-            RecordAmount string,
-            PromotionProductCode string,
-            DepartmentNumber string
+            TaxOverrideFlag string,
+            AnnulFlag string,
+            PrimaryCompanyId string,
+            OfferCode string,
+            SaveValue string,
+            PrimaryPurchaseRequirement string,
+            PrimaryPurchaseRequirementCode string,
+            PrimaryPurchaseFamilyCode string,
+            AdditionalPurchaseRulesCode string,
+            SecondPurchaseRequirement string,
+            SecondPurchaseRequirementCode string,
+            SecondPurchaseFamilyCode string,
+            SecondCompanyId string,
+            ThirdPurchaseRequirement string,
+            ThirdPurchaseRequirementCode string,
+            ThirdPurchaseFamilyCode string,
+            ThirdCompanyId string,
+            ExpirationDate string,
+            StartDate string,
+            SerialNumber string,
+            RetailerId string,
+            SaveValueCode string,
+            DiscountedItem string,
+            StoreCouponIndicator string,
+            NoMultiplyFlag string
     FROM @in
     USING new MyCustomExtractors.FixedWidthExtractor(
           new SQL.MAP<string, string>{
@@ -50,7 +77,7 @@ DECLARE @d1_137 string = @outPathRoot + @datedFolder + "_" + "d1_137_output.csv"
           );
 OUTPUT @bucket_D1_136
 TO @d1_136
-USING Outputters.Csv(outputHeader:true, quoting:false);
+USING Outputters.Csv(outputHeader : true, quoting : false);
 @bucket_D1_137 =
     EXTRACT RecordId string,
             StoreNumber string,
@@ -87,4 +114,4 @@ USING Outputters.Csv(outputHeader:true, quoting:false);
           );
 OUTPUT @bucket_D1_137
 TO @d1_137
-USING Outputters.Csv(outputHeader:true, quoting:false);
+USING Outputters.Csv(outputHeader : true, quoting : false);
