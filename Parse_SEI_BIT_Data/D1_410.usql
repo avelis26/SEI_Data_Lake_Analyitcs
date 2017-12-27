@@ -1,0 +1,42 @@
+﻿USE DATABASE [master];
+REFERENCE ASSEMBLY [Assemblies];
+// @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
+DECLARE @datedFolder string = "20171023";
+DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
+DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
+DECLARE @d1_410 string = @outPathRoot + @datedFolder + "_" + "d1_410_output.csv";
+@bucket_D1_410 =
+    EXTRACT RecordId string,
+            StoreNumber string,
+            TransactionType string,
+            DayNumber string,
+            ShiftNumber string,
+            TransactionUID string,
+            SequenceNumber string,
+            OwnerSequenceNumber string,
+            CouponCouponNumber string,
+            RecordCount string,
+            ReportedItemFlag string,
+            OwnerType string
+    FROM @in
+    USING new MyCustomExtractors.FixedWidthExtractor(
+          new SQL.MAP<string, string>{
+          {"RecordId", "2"},
+          {"StoreNumber", "6"},
+          {"TransactionType", "3"},
+          {"DayNumber", "6"},
+          {"ShiftNumber", "6"},
+          {"TransactionUID", "10"},
+          {"SequenceNumber", "10"},
+          {"OwnerSequenceNumber", "10"},
+          {"CouponCouponNumber", "10"},
+          {"RecordCount", "6"},
+          {"ReportedItemFlag", "1"},
+          {"OwnerType", "1"}
+          },
+          "410",
+          "D1"
+          );
+OUTPUT @bucket_D1_410
+TO @d1_410
+USING Outputters.Csv(outputHeader : true, quoting : false);
