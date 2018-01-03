@@ -5,12 +5,6 @@ DECLARE @datedFolder string = "20171112";
 DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
 DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
 DECLARE @d1_121 string = @outPathRoot + @datedFolder + "_" + "d1_121_output.csv";
-/*
-DECLARE @datedFolder string = "20171026";
-DECLARE @in string = "/BIT_CRM/" + @datedFolder + "/{*}";
-DECLARE @outPathRoot string = "/BIT_CRM/" + @datedFolder + "/";
-DECLARE @d1_121 string = @outPathRoot + @datedFolder + "_" + "d1_121_output.csv";
-*/
 @bucket_D1_121 =
 	EXTRACT
 		RecordId string,

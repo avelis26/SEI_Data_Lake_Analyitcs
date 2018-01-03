@@ -1,50 +1,52 @@
 ﻿USE DATABASE [master];
-REFERENCE ASSEMBLY Assemblies;
-DECLARE @in string = "/BIT_CRM/bit_test_compressed/{*}";
-DECLARE @d1_136 string = "/BIT_CRM/Parsed/d1_136_output.csv";
+REFERENCE ASSEMBLY [Assemblies];
+// @datedFolder MUST BE ON LINE 4! DO NOT MOVE!!!
+DECLARE @datedFolder string = "20171023";
+DECLARE @in string = "adl://711dlprodcons01.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/{*}";
+DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/BIT_CRM/" + @datedFolder + "/";
+DECLARE @d1_136 string = @outPathRoot + @datedFolder + "_" + "d1_136_output.csv";
 @bucket_D1_136 =
-	EXTRACT
-		RecordId string,
-		StoreNumber string,
-		TransactionType string,
-		DayNumber string,
-		ShiftNumber string,
-		TransactionUID string,
-		SequenceNumber string,
-		RecordType string,
-		ErrorCorrectionFlag string,
-		VoidFlag string,
-		TaxableFlag string,
-		TaxOverideFlag string,
-		PromotionId string,
-		RecordCount string,
-		RecordAmount string,
-		PromotionProductCode string,
-		DepartmentNumber string
-	FROM @in
-	USING new MyCustomExtractors.FixedWidthExtractor(
-		new SQL.MAP<string, string> {
-			{"RecordId","2"},
-			{"StoreNumber","6"},
-			{"TransactionType","3"},
-			{"DayNumber","6"},
-			{"ShiftNumber","6"},
-			{"TransactionUID","11"},
-			{"SequenceNumber","11"},
-			{"RecordType","6"},
-			{"ErrorCorrectionFlag","1"},
-			{"VoidFlag","1"},
-			{"TaxableFlag","1"},
-			{"TaxOverideFlag","1"},
-			{"PromotionId","6"},
-			{"RecordCount","6"},
-			{"RecordAmount","6"},
-			{"PromotionProductCode","6"},
-			{"DepartmentNumber","6"}
-		},
-		"136",
-		"D1"
-	);
+    EXTRACT RecordId string,
+            StoreNumber string,
+            TransactionType string,
+            DayNumber string,
+            ShiftNumber string,
+            TransactionUID string,
+            SequenceNumber string,
+            RecordType string,
+            ErrorCorrectionFlag string,
+            VoidFlag string,
+            TaxableFlag string,
+            TaxOverideFlag string,
+            PromotionId string,
+            RecordCount string,
+            RecordAmount string,
+            PromotionProductCode string,
+            DepartmentNumber string
+    FROM @in
+    USING new MyCustomExtractors.FixedWidthExtractor(
+          new SQL.MAP<string, string>{
+          {"RecordId", "2"},
+          {"StoreNumber", "6"},
+          {"TransactionType", "3"},
+          {"DayNumber", "6"},
+          {"ShiftNumber", "6"},
+          {"TransactionUID", "11"},
+          {"SequenceNumber", "11"},
+          {"RecordType", "6"},
+          {"ErrorCorrectionFlag", "1"},
+          {"VoidFlag", "1"},
+          {"TaxableFlag", "1"},
+          {"TaxOverideFlag", "1"},
+          {"PromotionId", "6"},
+          {"RecordCount", "6"},
+          {"RecordAmount", "6"},
+          {"PromotionProductCode", "6"},
+          {"DepartmentNumber", "6"}
+          },
+          "136",
+          "D1"
+          );
 OUTPUT @bucket_D1_136
 TO @d1_136
-USING Outputters.Csv(outputHeader:true, quoting:false);
+USING Outputters.Csv(outputHeader : true, quoting : false);
