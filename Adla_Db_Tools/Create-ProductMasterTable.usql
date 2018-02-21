@@ -1,37 +1,11 @@
 ﻿USE DATABASE [master];
-
 DECLARE @outPathRoot string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/";
-DECLARE @outputFile string = @outPathRoot + "productTable_TEST.csv";
-//DECLARE @storeIn string = "adl://mscrmprodadls.azuredatalakestore.net/Temp/storeTable.csv";
-// dbo.STOR_Master
+DECLARE @outputFile string = @outPathRoot + "MsTestSqlDw_TEST.csv";
 @results =
     SELECT *
-    FROM EXTERNAL [MsProdSqlDw_7ELE] EXECUTE
-	@"SELECT
-	   [ProductMaster_Id]
-      ,[SLIN]
-      ,[UPC]
-      ,[Category_Cd]
-      ,[Category_Ds]
-      ,case when ISNULL([Depart_Cd],'0')='' then '0' else ISNULL([Depart_Cd],'0') end AS [Depart_Cd]
-      ,[Manufacturer_Cd]
-      ,[Manufacturer_Nm]
-      ,[PSA_Cd]
-      ,[PSA_Ds]
-      ,[Item_Ds]
-      ,[SubCategory_Cd]
-      ,[SubCategory_Ds]
-      ,[VerticalClass_Cd]
-      ,[VerticalClass_Ds]
-      ,[CorpBrand]
-      ,[UPCType_Cd]
-      ,[AgeRestricted_Fg]
-      ,[CurrentImport_Id]
-      ,[OriginalImport_Id]
-      ,[Modified_Dttm]
-      ,[Created_Dttm]
-     FROM [dbo].[TRNS_ProductMaster]";
-
+    FROM EXTERNAL [MsTestSqlDw_7ELE] EXECUTE
+	@"SELECT DISTINCT([EndDate])
+	FROM [dbo].[tmp_query_data_joined]";
 OUTPUT @results
 TO @outputFile
 USING Outputters.Csv(outputHeader : true, quoting : false);
