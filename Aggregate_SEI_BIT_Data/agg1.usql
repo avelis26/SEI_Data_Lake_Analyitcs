@@ -1,0 +1,204 @@
+﻿USE DATABASE [master];
+DECLARE @startDate string = "2018-01-20";
+DECLARE @endDate string = "2018-02-18";
+DECLARE @outPathRoot string = "adl://mscrmprodadlsto.azuredatalakestore.net/BIT_CRM/" + @startDate + "_" + @endDate + "/";
+DECLARE @outputFileOne string = @outPathRoot + "aggOne.csv";
+DECLARE @outputFileTwo string = @outPathRoot + "aggTwo.csv";
+@headersTable =
+	SELECT *
+	FROM EXTERNAL [MsTestSqlDw_7ELE] EXECUTE
+	@"SELECT *
+	FROM [dbo].[prod_121_Headers]";
+@detailsTable =
+	SELECT *
+	FROM EXTERNAL [MsTestSqlDw_7ELE] EXECUTE
+	@"SELECT *
+	FROM [dbo].[prod_122_Details]";
+@productTable =
+	SELECT *
+	FROM EXTERNAL [MsTestSqlDw_7ELE] EXECUTE
+	@"SELECT *
+	FROM [dbo].[ext_productTable]";
+@storeTable =
+	SELECT *
+	FROM EXTERNAL [MsTestSqlDw_7ELE] EXECUTE
+	@"SELECT *
+	FROM [dbo].[ext_storeTable]";
+@AggregateOne =
+SELECT 	
+    X.EndDate,
+    X.StoreNumber,
+    p.PSA_Cd,
+    p.PSA_Ds,
+    p.Category_Cd,
+    p.Category_Ds,
+    RewardMemberID == null OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
+    COUNT(DISTINCT X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" ? Uniq_Id : NULL) AS Txn_Cnt_DayP1,
+    COUNT(DISTINCT X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" ? Uniq_Id : NULL) AS Txn_Cnt_DayP2,
+    COUNT(DISTINCT X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" ? Uniq_Id : NULL) AS Txn_Cnt_DayP3,
+    COUNT(DISTINCT X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" ? Uniq_Id : NULL) AS Txn_Cnt_DayP4,
+    COUNT(DISTINCT X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" ? Uniq_Id : NULL) AS Txn_Cnt_DayP5,
+    COUNT(DISTINCT X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" ? Uniq_Id : NULL) AS Txn_Cnt_DayP6,
+    COUNT(DISTINCT X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" ? Uniq_Id : NULL) AS Txn_Cnt_DayP7,
+
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" ? 0
+	    : X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+	AS [Ttl_Amt_DayP1],
+	
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" ? 0
+	    : X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+    AS [Ttl_Amt_DayP2],
+
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" ? 0
+	    : X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+    AS [Ttl_Amt_DayP3],  
+
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" ? 0
+	    : X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs([DT1.RecordAmount)
+	    : X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+    AS [Ttl_Amt_DayP4], 
+
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" ? 0
+	    : X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+    AS [Ttl_Amt_DayP5], 
+
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" ? 0
+	    : X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * Math.Abs([DT1.RecordAmount)
+	    : X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+    AS [Ttl_Amt_DayP6], 
+
+    SUM(DT1.RecordTypeIN (18) AND X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" ? 0
+	    : X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" AND DT1.RecordType IN (5) ? (-1) * Math.Abs(DT1.RecordAmount)
+	    : X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" AND DT1.RecordType IN (1) ? DT1.RecordAmount : 0)
+    AS [Ttl_Amt_DayP7],
+    
+    
+    
+    SUM(DT1.RecordType IN (18) AND X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" ? 0
+	    : X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "00:00:00.0000000" AND X.EndTime < "06:00:00.0000000" AND DT1.RecordType IN (1) ? RecordCount : 0) 
+    AS [Ttl_Itm_Amt_DayP1], 
+
+    SUM(DT1.RecordType  IN (18) AND X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" ? 0
+	    : X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "06:00:00.0000000" AND X.EndTime < "09:00:00.0000000" AND DT1.RecordType IN (1) ? RecordCount : 0)
+    AS [Ttl_Itm_Amt_DayP2],  
+
+    SUM(DT1.RecordType  IN (18) AND X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" ? 0
+	    : X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "09:00:00.0000000" AND X.EndTime < "11:00:00.0000000" AND DT1.RecordType IN (1) ? RecordCount : 0)
+    AS [Ttl_Itm_Amt_DayP3], 
+
+    SUM(DT1.RecordType  IN (18) AND X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" ? 0
+	    : X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "11:00:00.0000000" AND X.EndTime < "14:00:00.0000000" AND DT1.RecordType IN (1) ? RecordCount : 0)
+    AS [Ttl_Itm_Amt_DayP4],
+
+    SUM(DT1.RecordType  IN (18) AND X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" ? 0
+	    : X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "14:00:00.0000000" AND X.EndTime < "16:00:00.0000000" AND DT1.RecordTypeIN (1) ? RecordCount : 0)
+    AS [Ttl_Itm_Amt_DayP5], 
+
+    SUM(DT1.RecordType  IN (18) AND X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" ? 0
+	    : X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "16:00:00.0000000" AND X.EndTime < "19:00:00.0000000" AND DT1.RecordType IN (1) ? RecordCount : 0) 
+    AS [Ttl_Itm_Amt_DayP6],  
+
+    SUM(DT1.RecordType  IN (18) AND X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" ? 0
+	    : X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" AND DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+	    : X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" AND DT1.RecordType IN (5) ? (-1) * RecordCount
+	    : X.EndTime >= "19:00:00.0000000" AND X.EndTime < "23:59:59.9999999" AND DT1.RecordType IN (1) ? RecordCount : 0) 
+    AS [Ttl_Itm_Amt_DayP7]
+
+FROM @headersTable AS X
+INNER JOIN @detailsTable AS DT1
+    ON X.DayNumber == DT1.DayNumber 
+    AND X.StoreNumber == DT1.StoreNumber 
+    AND X.ShiftNumber == DT1.ShiftNumber 
+    AND X.TransactionUID == DT1.TransactionUID
+INNER JOIN @productTable AS p
+    ON p.slin == DT1.ProductNumber AND p.upc == DT1.String_PLU // int == int AND varchar == string
+INNER JOIN @storeTable AS s
+    ON s.Store_Id == X.StoreNumber // int == int
+WHERE 
+    Aborted == "N" 
+    AND DT1.VoidFlag == "N" 
+    AND DT1.RecordType IN(1, 5, 18)
+    AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103) 
+GROUP BY 
+    X.EndDate,
+    X.StoreNumber,
+    p.PSA_Cd,
+    p.PSA_Ds,
+    p.Category_Cd,
+    p.Category_Ds,
+    RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member";
+OUTPUT @AggregateOne
+TO @outputFileOne
+USING Outputtersto.Csv(outputHeader : true, quoting : false);
+@AggregateTwo =
+SELECT 
+    EndDate,
+    StoreNumber,
+    Member_Status,
+    Txn_Cnt,
+    ItemCount,
+    TotalAmount,
+    Member_Status == "Non_Member"? 0 : Unique_Member_Count AS Unique_Member_Count
+FROM
+    (
+        SELECT
+            X.EndDate,
+            X.StoreNumber,
+            RewardMemberID == NULL OR RewardMemberID == "                   "? "Non_Member" : "Member" AS Member_Status,
+            COUNT(DISTINCT Uniq_Id) AS Txn_Cnt,
+            SUM(DT1.RecordType IN (18) ? 0
+    	        : DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * RecordCount
+    	        : DT1.RecordType IN (5) ? (-1) * RecordCount
+    	        : DT1.RecordType IN (1) ? RecordCount : 0) AS ItemCount,                           
+            SUM(DT1.RecordType IN (18) ? 0
+    	        : DT1.RecordType IN (1) AND p.SubCategory_Cd == "99" ? (-1) * DT1.RecordAmount
+    	        : DT1.RecordType IN (5) ? (-1) * DT1.RecordAmount 
+    	        : DT1.RecordType IN (1) ? DT1.RecordAmount : 0) AS TotalAmount,
+            COUNT(DISTINCT RewardMemberID) AS Unique_Member_Count
+        FROM @headersTable AS X
+        INNER JOIN @detailsTable AS DT1
+            ON X.DayNumber == DT1.DayNumber 
+            AND X.StoreNumber == DT1.StoreNumber 
+            AND X.ShiftNumber == DT1.ShiftNumber 
+            AND X.TransactionUID == DT1.TransactionUID
+        INNER JOIN @productTable AS p
+            ON p.slin == DT1.ProductNumber 
+            AND p.upc == DT1.String_PLU 
+        INNER JOIN @storeTable AS s
+            ON s.Store_Id == X.StoreNumber
+        WHERE 
+            Aborted == "N" 
+            AND DT1.VoidFlag == "N" 
+            AND DT1.RecordType IN(1, 5, 18)
+            AND p.Depart_Cd NOT IN(340202, 340101, 341003, 340821, 341103)
+        GROUP BY 
+            X.EndDate,
+            X.StoreNumber,
+            RewardMemberID==null OR RewardMemberID=="                   " ? "Non_Member":"Member"
+    ) AS X;
+OUTPUT @AggregateTwo
+TO @outputFileTwo
+USING Outputtersto.Csv(outputHeader : true, quoting : false);
